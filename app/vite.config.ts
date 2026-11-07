@@ -17,6 +17,10 @@ export default defineConfig({
         target: API_TARGET,
         changeOrigin: true,
       },
+      "/api": {
+        target: API_TARGET,
+        changeOrigin: true,
+      },
       "/health": {
         target: API_TARGET,
         changeOrigin: true,

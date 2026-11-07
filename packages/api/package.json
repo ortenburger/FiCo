@@ -15,6 +15,7 @@
     "@fico/datasources": "workspace:*",
     "@fico/db": "workspace:*",
     "@fico/finanzmining": "workspace:*",
+    "@fico/gamification": "workspace:*",
     "@fico/ledger": "workspace:*",
     "@fico/net-tariffs": "workspace:*",
     "@fico/policy": "workspace:*",

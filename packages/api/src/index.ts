@@ -26,6 +26,7 @@ import { z } from "zod";
 import { registerDocumentReadRoutes } from "./document-read.js";
 import { registerDemoRoutes } from "./demo.js";
 import { registerDocumentRoutes } from "./documents.js";
+import { registerGamificationRoutes } from "./gamification.js";
 import { registerProfileRoutes } from "./profile.js";
 import { registerRetrievalRoutes } from "./retrieval.js";
 
@@ -250,6 +251,8 @@ await registerDocumentRoutes(app);
 await registerDocumentReadRoutes(app);
 await registerRetrievalRoutes(app);
 await registerDemoRoutes(app);
+registerGamificationRoutes(app);
+registerGamificationRoutes(app);
 
 // Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback
 // first on macOS, so an IPv4-only listener is not reachable by every client.
