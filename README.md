@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="FiCo Logo.png" alt="FiCo Logo" width="220" />
+  <img src="FiCo_Logo.png" alt="FiCo Logo" width="220" />
   <h1>FiCo</h1>
   <p><strong>Autonomous Financial Ledger & Net-Tariff Orchestration Engine (FL-NTOE)</strong></p>
   <p><em>Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.</em></p>
@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com"><img src="https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square" alt="Hackathon" /></a>
+  <a href="./user_stories.md"><img src="https://img.shields.io/badge/Spec-User%20Stories-informational?style=flat-square" alt="User Stories" /></a>
   <a href="./technical_overview.md"><img src="https://img.shields.io/badge/Architecture-Technical%20Overview-blueviolet?style=flat-square" alt="Architecture" /></a>
   <a href="./GAMIFICATION.md"><img src="https://img.shields.io/badge/Gamification-Duolingo%20Style%20%7C%20Weekly%20Streaks-FF9F43?style=flat-square" alt="Gamification" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square" alt="TypeScript" /></a>
@@ -37,7 +38,8 @@ Instead of reading 40 pages of boring legal texts, users upload their existing p
 
 ## 🎮 Gamification Core: How Users Experience FiCo
 
-> 📖 **Deep Dive:** Read [GAMIFICATION.md](./GAMIFICATION.md) for full specs on our Duolingo-inspired habit loops, streak freezes, weekly recap stories, bite-sized micro-learnings, and agentic micro-savings formulas.
+> 📖 **Deep Dive:** Read [GAMIFICATION.md](./GAMIFICATION.md) for full specs on our Duolingo-inspired habit loops, streak freezes, weekly recap stories, bite-sized micro-learnings, and agentic micro-savings formulas.  
+> 📋 **Product Specification:** See [user_stories.md](./user_stories.md) for the core user stories and acceptance criteria.
 
 ```
                ┌────────────────────────┐
