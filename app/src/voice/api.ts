@@ -217,3 +217,203 @@ export async function askCopilot(question: string): Promise<string> {
 
   return "Macro allocation analysis only. Verify any portfolio changes with your broker.";
 }
+
+async function safeJson<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<{ ok: true; data: T } | { ok: false; detail: string }> {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(path), init);
+  } catch (caught) {
+    return {
+      ok: false,
+      detail:
+        caught instanceof Error
+          ? caught.message
+          : "FiCo-Engine nicht erreichbar",
+    };
+  }
+  if (!response.ok) {
+    return { ok: false, detail: `HTTP ${response.status}` };
+  }
+  try {
+    return { ok: true, data: (await response.json()) as T };
+  } catch {
+    return { ok: false, detail: "Ungültige JSON-Antwort" };
+  }
+}
+
+/** Voice: cash-buffer waterfall instruction */
+export async function evaluateWaterfallVoice(params: {
+  fixedCostSumLookback: number;
+  targetBufferMonths?: number;
+  liquidChecking: number;
+  liquidSavings?: number;
+}): Promise<string> {
+  const result = await safeJson<{
+    instruction: string;
+    rationale: string;
+    targetEmergencyBuffer: string;
+    currentLiquidReserve: string;
+    deficit: string;
+    surplus: string;
+  }>("/v1/ledger/waterfall", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fixedCostSumLookback: params.fixedCostSumLookback,
+      targetBufferMonths: params.targetBufferMonths ?? 3,
+      accounts: [
+        { type: "CHECKING", balanceAmount: params.liquidChecking },
+        {
+          type: "SAVINGS",
+          balanceAmount: params.liquidSavings ?? 0,
+        },
+      ],
+    }),
+  });
+  if (!result.ok) {
+    return `Waterfall nicht verfügbar: ${result.detail}`;
+  }
+  const d = result.data;
+  return [
+    `Empfehlung: ${d.instruction}.`,
+    `Liquidität ${d.currentLiquidReserve} € bei Zielpuffer ${d.targetEmergencyBuffer} €`,
+    d.deficit !== "0.00" ? `(Defizit ${d.deficit} €)` : `(Überschuss ${d.surplus} €).`,
+    d.rationale,
+  ].join(" ");
+}
+
+/** Voice: list Nettoprodukte from HonorarKonzept / con.fee */
+export async function listNetTariffsVoice(params?: {
+  provider?: "HONORARKONZEPT" | "CONFEE";
+  line?: string;
+  search?: string;
+  limit?: number;
+}): Promise<string> {
+  const qs = new URLSearchParams();
+  if (params?.provider) qs.set("provider", params.provider);
+  if (params?.line) qs.set("line", params.line);
+  if (params?.search) qs.set("search", params.search);
+  qs.set("limit", String(params?.limit ?? 5));
+
+  const result = await safeJson<{
+    count: number;
+    products: Array<{
+      provider: string;
+      productName: string;
+      carrierName: string;
+      line: string;
+      id: string;
+    }>;
+  }>(`/v1/net-tariffs/products?${qs}`);
+
+  if (!result.ok) return `Nettotarife nicht verfügbar: ${result.detail}`;
+  if (!result.data.products.length) {
+    return "Keine Nettoprodukte für diese Filter gefunden.";
+  }
+  const lines = result.data.products.map(
+    (p, i) =>
+      `${i + 1}. ${p.productName} (${p.carrierName}, ${p.provider}, ${p.line})`,
+  );
+  return `Gefunden ${result.data.count} Nettoprodukte: ${lines.join("; ")}. Vergleich und Antrag nur als Makro-/Deep-Link — keine Wertpapierempfehlung.`;
+}
+
+/** Voice: gross vs net advantage (explicit advisory fee) */
+export async function compareNetTariffVoice(params: {
+  provider?: "HONORARKONZEPT" | "CONFEE";
+  grossAnnualCost: number;
+  netAnnualCost: number;
+  advisoryFeeAnnual: number;
+  years?: number;
+}): Promise<string> {
+  const result = await safeJson<{
+    annualProductSavings: number;
+    annualNetOfAdvisory: number;
+    npvSavings: number;
+    breakEvenYears: number | null;
+    feeType: string;
+  }>("/v1/net-tariffs/compare", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      provider: params.provider ?? "CONFEE",
+      grossAnnualCost: params.grossAnnualCost,
+      netAnnualCost: params.netAnnualCost,
+      advisoryFeeAnnual: params.advisoryFeeAnnual,
+      years: params.years ?? 10,
+    }),
+  });
+  if (!result.ok) return `Vergleich nicht verfügbar: ${result.detail}`;
+  const d = result.data;
+  return [
+    `Jährliche Produkt-Ersparnis ${d.annualProductSavings.toFixed(0)} €`,
+    `nach Honorar (${d.feeType}) noch ${d.annualNetOfAdvisory.toFixed(0)} €/Jahr`,
+    `NPV über den Horizont ${d.npvSavings.toFixed(0)} €`,
+    d.breakEvenYears != null ? `Break-even Jahr ${d.breakEvenYears}.` : "",
+  ]
+    .filter(Boolean)
+    .join(". ");
+}
+
+/** Voice: economic gate before finexpert / F&B */
+export async function evaluatePolicyGateVoice(params: {
+  policyType: string;
+  subscriptionTier?: "FREE" | "ACTIVE_SUBSCRIBER";
+}): Promise<string> {
+  const result = await safeJson<{
+    triggerStatus: string;
+    action: string;
+    callFinexpert: boolean;
+    previewMessage?: string;
+    reason?: string;
+  }>("/v1/policy/economic-gate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      policyType: params.policyType,
+      subscriptionTier: params.subscriptionTier ?? "FREE",
+    }),
+  });
+  if (!result.ok) return `Policy-Gate nicht verfügbar: ${result.detail}`;
+  const d = result.data;
+  if (d.callFinexpert) {
+    return `Policy-Gate: finexpert/F&B freigeschaltet (${d.triggerStatus}).`;
+  }
+  return [
+    `Policy-Gate: ${d.triggerStatus} / ${d.action}.`,
+    d.previewMessage ?? d.reason ?? "Kein externer Synopsen-Call.",
+  ].join(" ");
+}
+
+/** Voice: search uploaded policy vault via retrieval */
+export async function searchDocumentsVoice(
+  userId: string,
+  question: string,
+): Promise<string> {
+  const trimmed = question.trim();
+  if (!trimmed) return "Bitte eine Frage zu den hochgeladenen Dokumenten stellen.";
+
+  const result = await safeJson<{
+    chunks: string[];
+    searchable: boolean;
+    reason?: string;
+  }>("/v1/retrieval", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, question: trimmed }),
+  });
+  if (!result.ok) return `Dokumentensuche nicht verfügbar: ${result.detail}`;
+  if (!result.data.searchable) {
+    return result.data.reason ?? "Dokumentensuche ist nicht konfiguriert.";
+  }
+  if (!result.data.chunks.length) {
+    return "In den hochgeladenen Dokumenten dazu nichts gefunden.";
+  }
+  const snippet = result.data.chunks
+    .slice(0, 3)
+    .map((c) => c.replace(/\s+/g, " ").slice(0, 220))
+    .join(" … ");
+  return `Aus dem Dokumenten-Tresor: ${snippet}`;
+}

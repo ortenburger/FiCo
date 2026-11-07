@@ -41,7 +41,14 @@ await app.register(cors, {
 app.get("/health", async () => ({
   status: "ok",
   service: "fico-api",
-  contexts: ["A:OpenFinance", "B:Ledger", "C:Policy"],
+  contexts: [
+    "A:OpenFinance",
+    "B:Ledger",
+    "C:Policy",
+    "Voice",
+    "NetTariffs",
+    "Finanzmining",
+  ],
 }));
 
 /**

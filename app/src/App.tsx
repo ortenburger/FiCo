@@ -536,9 +536,10 @@ function Workspace({
             </li>
           </ul>
           <small className="profile-hint">
-            Wird vom ElevenLabs-Agent über das Client-Tool
-            <code> set_profile_field </code> gesetzt und per{" "}
-            <code>PUT /v1/profile</code> gespeichert.
+            Voice-Tools: <code>set_profile_field</code>, <code>ask_copilot</code>,{" "}
+            <code>evaluate_waterfall</code>, <code>list_net_tariffs</code>,{" "}
+            <code>compare_net_tariff</code>, <code>evaluate_policy_gate</code>,{" "}
+            <code>search_documents</code>.
           </small>
 
           <h2>Demo-Flow</h2>
@@ -548,8 +549,8 @@ function Workspace({
               braucht eine eigene public Agent-ID.
             </li>
             <li>
-              <strong>Intake</strong> FiCo fragt Bedarf, Fristen und
-              Vertragspunkte ab.
+              <strong>Intake</strong> Profil + Vault; Agent kann Waterfall,
+              Nettotarife (HonorarKonzept/con.fee) und Policy-Gate aufrufen.
             </li>
             <li>
               <strong>Export</strong> Transkript als JSON sichern — Grundlage für
