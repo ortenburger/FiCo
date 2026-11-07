@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.local
+*.log
+.DS_Store
+.turbo/
+*.tsbuildinfo
+packages/db/prisma/*.db
+packages/db/prisma/*.db-journal
+.idea/
+.vscode/
+graphify-out/
