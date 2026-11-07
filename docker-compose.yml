@@ -28,23 +28,32 @@ services:
       timeout: 3s
       retries: 10
 
-  # MinIO was pulled from the Docker Hub repository, so the image tag below is
-  # no longer resolvable there. The object-storage path (document upload) needs
-  # a reachable image before it can be started; the voice intake does not.
-  minio:
-    image: minio/minio:RELEASE.2024-09-13T20-26-02Z
-    command: server /data --console-address ":9001"
+  # S3-compatible object storage for the document vault (PDF upload).
+  # The MinIO images were removed from Docker Hub and quay.io, so the stack uses
+  # adobe/s3mock: port 9090 in the container, 9000 on the host (matches
+  # S3_ENDPOINT=http://localhost:9000), CORS answered with "*" for the browser.
+  s3:
+    image: adobe/s3mock:latest
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      COM_ADOBE_S3MOCK_STORE_REGION: eu-central-1
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:9090"
     volumes:
-      - fico_minio:/data
-    profiles: ["storage"]
+      - fico_s3:/data
+
+  # One-shot: creates the bucket from S3_BUCKET (default fico-documents).
+  s3-init:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      - s3
+    environment:
+      S3_BUCKET: ${S3_BUCKET:-fico-documents}
+    entrypoint: ["sh", "/init-bucket.sh"]
+    volumes:
+      - ./infra/init-bucket.sh:/init-bucket.sh:ro
+    restart: "no"
 
 volumes:
   fico_pg:
   fico_redis:
-  fico_minio:
+  fico_s3:
