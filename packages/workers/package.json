@@ -1,0 +1,25 @@
+{
+  "name": "@fico/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@fico/aisp": "workspace:*",
+    "@fico/db": "workspace:*",
+    "@fico/ledger": "workspace:*",
+    "@fico/policy": "workspace:*",
+    "bullmq": "^5.41.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}

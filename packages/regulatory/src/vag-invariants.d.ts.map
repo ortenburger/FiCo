@@ -1,0 +1,1 @@
+{"version":3,"file":"vag-invariants.d.ts","sourceRoot":"","sources":["vag-invariants.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,2EAA2E;AAC3E,eAAO,MAAM,2BAA2B,2HAM9B,CAAC;AAEX,MAAM,MAAM,cAAc,GAAG,cAAc,GAAG,sBAAsB,CAAC;AAErE,wBAAgB,oBAAoB,CAAC,OAAO,EAAE,MAAM,GAAG,OAAO,CAAC,OAAO,IAAI,cAAc,CAMvF;AAED,wBAAgB,yBAAyB,CAAC,IAAI,EAAE,MAAM,GAAG,OAAO,CAG/D"}

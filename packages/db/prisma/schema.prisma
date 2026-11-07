@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  DEPOT
+  CREDIT_CARD
+  LOAN
+}
+
+enum TransactionCategory {
+  INCOME
+  FIXED_COST
+  VARIABLE_SPEND
+  SAVINGS_INVESTMENT
+  DEBT_SERVICE
+}
+
+enum PolicyType {
+  TERM_LIFE
+  BU_DISABILITY
+  PRIVATE_HEALTH
+  PENSION_BASE
+  PENSION_PRIVATE
+  PENSION_OCCUPATIONAL
+  PROPERTY_CASUALTY
+  LEGAL_PROTECTION
+  PET_HEALTH
+}
+
+enum PolicyCostStructure {
+  COMMISSION_ZILLMERIZED
+  GROSS_STANDARD
+  NET_HONORAR
+}
+
+enum FbTriggerStatus {
+  SKIPPED_UNECONOMIC
+  PENDING_APPROVAL
+  DISPATCHED
+  COMPLETED
+  FAILED
+  REJECTED
+}
+
+enum ConsentStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum SubscriptionTier {
+  FREE
+  ACTIVE_SUBSCRIBER
+}
+
+/// Net-carrier underwriting state machine (§ 63 VVG / Underwriting Chasm guard)
+enum PolicySwitchStatus {
+  DRAFT
+  SYNOPSIS_COMPLETE
+  APPLICATION_SUBMITTED
+  UNDERWRITING
+  POLICY_ISSUED
+  CANCELLATION_ALLOWED
+  CANCELLED
+  REJECTED_UNDERWRITING
+}
+
+enum JournalEntryStatus {
+  POSTED
+  VOIDED
+}
+
+// ─── 1. Identity & Mandator Layer ────────────────────────────────────────────
+
+model User {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String           @unique @db.VarChar(255)
+  passwordHash     String           @map("password_hash") @db.VarChar(255)
+  subscriptionTier SubscriptionTier @default(FREE) @map("subscription_tier")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  consents            BankConsent[]
+  accounts            Account[]
+  policies            InsurancePolicy[]
+  allocationProfile   AllocationProfile?
+  journalEntries      JournalEntry[]
+  policySwitchCases   PolicySwitchCase[]
+
+  @@map("users")
+}
+
+// ─── 2. Open Banking & Wealth Integration ────────────────────────────────────
+
+model FinancialInstitution {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.VarChar(255)
+  bic       String?  @db.VarChar(11)
+  adapter   String   @db.VarChar(64) // FINAPI | WEALTHAPI | TINK
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  consents BankConsent[]
+
+  @@map("financial_institutions")
+}
+
+model BankConsent {
+  id                 String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String        @map("user_id") @db.Uuid
+  institutionId      String        @map("institution_id") @db.Uuid
+  externalConsentId  String        @map("external_consent_id") @db.VarChar(255)
+  scaValidUntil      DateTime      @map("sca_valid_until") @db.Timestamptz(6)
+  status             ConsentStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution FinancialInstitution @relation(fields: [institutionId], references: [id])
+  accounts    Account[]
+
+  @@unique([userId, institutionId], name: "uq_user_institution_consent")
+  @@map("bank_consents")
+}
+
+model Account {
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String      @map("user_id") @db.Uuid
+  consentId        String?     @map("consent_id") @db.Uuid
+  type             AccountType
+  iban             String?     @db.VarChar(34)
+  currency         String      @default("EUR") @db.VarChar(3)
+  /// Cached balance derived from posted ledger lines (OCC-protected)
+  balanceAmount    Decimal     @map("balance_amount") @db.Decimal(14, 2)
+  balanceUpdatedAt DateTime    @map("balance_updated_at") @db.Timestamptz(6)
+  /// Optimistic concurrency control — never SELECT FOR UPDATE
+  version          Int         @default(1)
+  createdAt        DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consent              BankConsent?        @relation(fields: [consentId], references: [id], onDelete: SetNull)
+  transactions         Transaction[]
+  ledgerLines          LedgerLine[]
+  emergencyFundFor     AllocationProfile[] @relation("EmergencyFundAccount")
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId        String               @map("account_id") @db.Uuid
+  externalId       String?              @map("external_id") @db.VarChar(255)
+  bookingDate      DateTime             @map("booking_date") @db.Date
+  valueDate        DateTime             @map("value_date") @db.Date
+  amount           Decimal              @db.Decimal(14, 2)
+  currency         String               @default("EUR") @db.VarChar(3)
+  counterpartyName String?              @map("counterparty_name") @db.VarChar(255)
+  counterpartyIban String?              @map("counterparty_iban") @db.VarChar(34)
+  remittanceInfo   String?              @map("remittance_info")
+  category         TransactionCategory?
+  subCategory      String?              @map("sub_category") @db.VarChar(64)
+  isRecurring      Boolean              @default(false) @map("is_recurring")
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, externalId], name: "uq_account_tx")
+  @@index([accountId, bookingDate(sort: Desc)], name: "idx_transactions_account_date")
+  @@map("transactions")
+}
+
+// ─── Double-entry event store (immutable append-only) ────────────────────────
+
+model JournalEntry {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String             @map("user_id") @db.Uuid
+  description String
+  reference   String?            @db.VarChar(128)
+  status      JournalEntryStatus @default(POSTED)
+  postedAt    DateTime           @default(now()) @map("posted_at") @db.Timestamptz(6)
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lines LedgerLine[]
+
+  @@index([userId, postedAt(sort: Desc)])
+  @@map("journal_entries")
+}
+
+model LedgerLine {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  journalEntryId String  @map("journal_entry_id") @db.Uuid
+  accountId      String  @map("account_id") @db.Uuid
+  /// Debit amount (≥ 0). Exactly one of debit/credit is non-zero per line.
+  debit          Decimal @default(0) @db.Decimal(14, 2)
+  /// Credit amount (≥ 0). Exactly one of debit/credit is non-zero per line.
+  credit         Decimal @default(0) @db.Decimal(14, 2)
+  memo           String? @db.VarChar(255)
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account      Account      @relation(fields: [accountId], references: [id])
+
+  @@index([accountId])
+  @@map("ledger_lines")
+}
+
+// ─── 3. Insurance Contract & Arbitrage Engine ────────────────────────────────
+
+model InsurancePolicy {
+  id                         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                     String              @map("user_id") @db.Uuid
+  providerName               String              @map("provider_name") @db.VarChar(255)
+  policyNumber               String?             @map("policy_number") @db.VarChar(128)
+  policyType                 PolicyType          @map("policy_type")
+  costStructure              PolicyCostStructure @map("cost_structure")
+  monthlyPremium             Decimal             @map("monthly_premium") @db.Decimal(10, 2)
+  startDate                  DateTime            @map("start_date") @db.Date
+  guaranteedInterestRate     Decimal?            @map("guaranteed_interest_rate") @db.Decimal(4, 2)
+  estimatedCommissionAlphaPct Decimal?           @map("estimated_commission_alpha_pct") @db.Decimal(4, 2)
+  rawDocumentS3Key           String?             @map("raw_document_s3_key") @db.VarChar(512)
+  documentStatus             String              @default("PENDING") @map("document_status") @db.VarChar(32)
+  createdAt                  DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  synopsisRuns  FbSynopsisRun[]
+  switchCases   PolicySwitchCase[]
+
+  @@index([userId])
+  @@map("insurance_policies")
+}
+
+model FbSynopsisRun {
+  id                      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  policyId                String         @map("policy_id") @db.Uuid
+  triggerStatus           FbTriggerStatus @default(PENDING_APPROVAL) @map("trigger_status")
+  inputPayload            Json           @map("input_payload")
+  rawSynopsisResponse     Json?          @map("raw_synopsis_response")
+  scoreDeltaJson          Json?          @map("score_delta_json")
+  estimatedCostReductionRiy Decimal?     @map("estimated_cost_reduction_riy") @db.Decimal(4, 3)
+  executedAt              DateTime?      @map("executed_at") @db.Timestamptz(6)
+  createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  policy InsurancePolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@index([policyId])
+  @@map("fb_synopsis_runs")
+}
+
+/// Prevents cancellation-letter generation until POLICY_ISSUED (Underwriting Chasm guard)
+model PolicySwitchCase {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String             @map("user_id") @db.Uuid
+  sourcePolicyId       String             @map("source_policy_id") @db.Uuid
+  targetCarrierRef     String             @map("target_carrier_ref") @db.VarChar(128)
+  status               PolicySwitchStatus @default(DRAFT)
+  issuedConfirmationHash String?          @map("issued_confirmation_hash") @db.VarChar(128)
+  cancellationLetterAllowed Boolean       @default(false) @map("cancellation_letter_allowed")
+  createdAt            DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourcePolicy InsurancePolicy @relation(fields: [sourcePolicyId], references: [id])
+
+  @@index([userId])
+  @@map("policy_switch_cases")
+}
+
+// ─── 4. Dynamic Cash Reserve & Allocation Targets ────────────────────────────
+
+model AllocationProfile {
+  userId                    String  @id @map("user_id") @db.Uuid
+  targetBufferMonths        Decimal @default(3.0) @map("target_buffer_months") @db.Decimal(3, 1)
+  currentBufferTargetAmount Decimal @map("current_buffer_target_amount") @db.Decimal(12, 2)
+  emergencyFundAccountId    String? @map("emergency_fund_account_id") @db.Uuid
+  targetEquityRatio         Decimal @default(0.70) @map("target_equity_ratio") @db.Decimal(3, 2)
+  rebalancingThresholdPct   Decimal @default(0.05) @map("rebalancing_threshold_pct") @db.Decimal(3, 2)
+  updatedAt                 DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emergencyFundAccount Account? @relation("EmergencyFundAccount", fields: [emergencyFundAccountId], references: [id])
+
+  @@map("allocation_profiles")
+}
+
+// ─── Advisory fee billing (§ 34d GewO / § 48b VAG — NO kickback ledger) ──────
+/// Explicit software/advisory fee only. No broker-commission-to-user tables exist.
+
+model AdvisoryFeeInvoice {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  amountEur   Decimal  @map("amount_eur") @db.Decimal(10, 2)
+  feeType     String   @map("fee_type") @db.VarChar(64) // ADVISORY_FEE | SOFTWARE_SERVICE_FEE
+  description String
+  billedAt    DateTime @default(now()) @map("billed_at") @db.Timestamptz(6)
+
+  @@index([userId])
+  @@map("advisory_fee_invoices")
+}
