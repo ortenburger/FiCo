@@ -1,9 +1,14 @@
 # FiCo — Financial Copilot & Net-Tariff Orchestration Engine 🚀
 
+<p align="center">
+  <img src="./FiCo_Logo.png" alt="FiCo Logo" width="160" />
+</p>
+
 > **Built for Founders Hackathon Stuttgart — November 7, 2026**  
 > *Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.*
 
 [![Founders Hackathon 2026](https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square)](https://github.com)
+[![Architecture](https://img.shields.io/badge/Architecture-Technical%20Overview-blueviolet?style=flat-square)](./technical_overview.md)
 [![Gamification](https://img.shields.io/badge/Gamification-Duolingo%20Style%20%7C%20Weekly%20Streaks-FF9F43?style=flat-square)](./GAMIFICATION.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square)](https://nodejs.org/)
@@ -106,6 +111,8 @@ Autonomous background agents observe external data sources and calculate their r
 
 ## ⚙️ Engineering & Architecture: Built for BaFin-Grade Reality
 
+> 🛠️ **Deep Dive:** Read [technical_overview.md](./technical_overview.md) for the complete architectural blueprint, cross-domain sequence diagrams, bounded contexts, and failure domains.
+
 Behind the engaging gamification layer lies an autonomous, enterprise-grade financial ledger and regulatory orchestration engine designed specifically for the German and European regulatory framework.
 
 ```
@@ -147,6 +154,7 @@ Behind the engaging gamification layer lies an autonomous, enterprise-grade fina
 | **A — Open Finance Ingestion** | `@fico/aisp`, `@fico/workers` | PSD2/PSD3 read-only AISP bank sync, HMAC webhook authentication, recurring cashflow classifier. **No payment initiation (PISP) attack surface.** |
 | **B — Core Financial Ledger** | `@fico/ledger` | High-precision append-only double-entry bookkeeping with Optimistic Concurrency Control (OCC) and deterministic cash waterfall algorithms. |
 | **C — Policy / Net-Broker** | `@fico/policy` | Zero-cost local OCR heuristics, economic gatekeeper (Denial-of-Wallet defense), and net-tariff synchronization. |
+| **D — Datasources Registry** | `@fico/datasources` | Canonical catalog of Open Finance (finAPI, Tink, wealthAPI) & finexpert.de Schnittstellen. |
 | **Regulatory Firewalls** | `@fico/regulatory` | Programmatic regulatory invariants (WpIG, VAG, GewO, VVG) compiled directly into code. |
 
 ---
@@ -172,37 +180,30 @@ Unlike generic AI wrappers, FiCo enforces hard regulatory invariants at the core
 
 ```
 packages/
-├── aisp/           # PSD2/PSD3 AISP adapter, HMAC webhooks, recurring transaction classifier
-├── datasources/    # Registry: Open Finance + finexpert + finanzmining + net tariffs
-├── finanzmining/   # cashbuzz analytics, predictions, contract identification
-├── net-tariffs/    # HonorarKonzept + con.fee Nettoprodukte connectors
-├── api/            # High-performance Fastify edge API (synchronous, lightweight)
-├── db/             # Prisma schema & PostgreSQL migrations (double-entry ledger models)
-├── ledger/         # Append-only double-entry OCC engine + deterministic cash waterfall
-├── policy/         # Local OCR heuristics, economic circuit breakers, net-policy evaluation
-├── regulatory/     # WpIG investment firewall, VAG commission invariants, VVG state machine
-└── workers/        # BullMQ background workers for async document & upstream operations
+├── aisp/         # finAPI + Tink + wealthAPI AISP connectors (read-only), HMAC, classifier
+├── datasources/  # Canonical registry: Open Finance + all finexpert.de/schnittstellen
+├── api/          # High-performance Fastify edge API (synchronous, lightweight)
+├── db/           # Prisma schema & PostgreSQL migrations (double-entry ledger models)
+├── ledger/       # Append-only double-entry OCC engine + deterministic cash waterfall
+├── policy/       # OCR heuristics, economic gate, finexpert Schnittstellen clients
+├── regulatory/   # WpIG investment firewall, VAG commission invariants, VVG state machine
+└── workers/      # BullMQ background workers for async document & upstream operations
 ```
 
-### finanzmining (cashbuzz)
+### Datasources & Integrations
 
-Connectors in `@fico/finanzmining` (OpenAPI 1.2.1 → `https://api.cashbuzz.io/v01`):
-
-- **Analytics** — `/data`, insights, affinities, attributes, finance groups, daily hints
-- **Predictions** — `/transactions?only_predicted=true`, insight forecasts
-- **Contracts** — `/contracts`, `/subscriptions` (+ org enrichment)
-- **Enrichment** — categorize / catsaction / document upload (feeds identification)
-
-Cashback/voucher APIs are intentionally not wired (§ 48b VAG).
-
-### Nettotarif partners
-
-| Provider | Docs | Package |
+| ID | Source | Role |
 | --- | --- | --- |
-| HonorarKonzept | https://www.honorarkonzept.de/start.html | `@fico/net-tariffs` |
-| con.fee | https://www.confee.de/ | `@fico/net-tariffs` |
+| `FINAPI` / `TINK` | Open Finance AISP | Bank accounts & transactions (no PISP) |
+| `WEALTHAPI` | Wealth & Custody | Depot snapshots |
+| `FINEXPERT_REST` | [finexpert Schnittstellen](https://www.finexpert.de/schnittstellen/) | REST API (kunden, risikocheck) |
+| `BLAU_DIREKT` | finexpert | Native pool two-way sync / Abschlussstrecke |
+| `BCA` | finexpert | BCA Bestand / CRM / Dokumente |
+| `FRANKE_BORNBERG` | finexpert | fb>vertragscheck synopsis |
+| `TAA` | finexpert | Tarifrechner → Beratungskonzept |
+| `MVP` | finexpert | Maklerverwaltungsprogramm sync |
 
-API: `GET /v1/net-tariffs/products`, `POST /v1/net-tariffs/compare`, `POST /v1/net-tariffs/applications/handoff` (execution-only deep-links).
+`GET /v1/datasources` returns runtime config status for all connected sources.
 
 ---
 
@@ -237,7 +238,7 @@ pnpm db:migrate
 ```
 
 ### 3. Run the Test Suite
-All core engines (Ledger, Waterfall, Regulatory Guards, Economic Gate) are verified with unit and invariant test suites:
+All core engines (Ledger, Waterfall, Regulatory Guards, Economic Gate, Datasources) are verified with unit and invariant test suites:
 ```bash
 pnpm test
 ```
