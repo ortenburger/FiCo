@@ -14,7 +14,7 @@ OUT="${OUT:-$ROOT/../FiCo_Demo_Final.mp4}"
 VOICE_ID="${VOICE_ID:-21m00Tcm4TlvDq8ikWAM}"
 MODEL_ID="${MODEL_ID:-eleven_multilingual_v2}"
 INTRO_SECONDS="${INTRO_SECONDS:-35}"
-TAIL_HOLD="${TAIL_HOLD:-5}"
+TAIL_HOLD="${TAIL_HOLD:-7}"
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
 
 VIDEO_FILTER="[0:v]fps=30,format=yuv420p,setsar=1[a];[1:v]scale=1920:-2,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x14181F,fps=30,format=yuv420p,setsar=1[b];[a][b]concat=n=2:v=1:a=0,tpad=stop_mode=clone:stop_duration=${TAIL_HOLD}[v]"
