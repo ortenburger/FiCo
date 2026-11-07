@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="FiCo_Logo.png" alt="FiCo Logo" width="220" />
+  <img src="FiCo Logo.png" alt="FiCo Logo" width="220" />
   <h1>FiCo</h1>
   <p><strong>Autonomous Financial Ledger & Net-Tariff Orchestration Engine (FL-NTOE)</strong></p>
   <p><em>Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.</em></p>
