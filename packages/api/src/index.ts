@@ -23,6 +23,7 @@ import {
   type NetTariffProviderId,
 } from "@fico/net-tariffs";
 import { z } from "zod";
+import { registerDocumentReadRoutes } from "./document-read.js";
 import { registerDemoRoutes } from "./demo.js";
 import { registerDocumentRoutes } from "./documents.js";
 import { registerProfileRoutes } from "./profile.js";
@@ -246,6 +247,7 @@ app.post("/v1/net-tariffs/applications/handoff", async (req) => {
 
 await registerProfileRoutes(app);
 await registerDocumentRoutes(app);
+await registerDocumentReadRoutes(app);
 await registerRetrievalRoutes(app);
 await registerDemoRoutes(app);
 

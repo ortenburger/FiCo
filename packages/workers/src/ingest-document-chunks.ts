@@ -1,6 +1,7 @@
 import { prisma } from "@fico/db";
-import { embed, vectorLiteral } from "./embed.js";
-import { fetchS3ObjectUtf8 } from "./s3-get-object.js";
+import { embedBatch, vectorLiteral } from "./embed.js";
+import { extractDocumentText } from "./extract-document-text.js";
+import { fetchS3Object } from "./s3-get-object.js";
 
 const CHUNK_MAX_CHARS = 1200;
 
@@ -46,6 +47,9 @@ export type IngestDocumentChunksResult = {
   chunksStored: number;
   chunksSkipped: number;
   skippedReasons: string[];
+  /** Non fatal problems, e.g. a scan without a text layer. */
+  warnings?: string[];
+  pageCount?: number;
 };
 
 export async function ingestDocumentChunks(
@@ -62,12 +66,25 @@ export async function ingestDocumentChunks(
   }
 
   let documentText = "";
+  let pageCount = 1;
+  const warnings: string[] = [];
+
   try {
     if (rawDocumentS3Key) {
-      documentText = await fetchS3ObjectUtf8(rawDocumentS3Key);
+      const buffer = await fetchS3Object(rawDocumentS3Key);
+      const extracted = await extractDocumentText(buffer);
+      documentText = extracted.text;
+      pageCount = extracted.pageCount || 1;
+      if (extracted.warning) {
+        warnings.push(extracted.warning);
+        console.warn("[document-ingestion] extraction:", extracted.warning);
+      }
     }
   } catch (err) {
     console.warn("[document-ingestion] S3 read failed:", err);
+    warnings.push(
+      err instanceof Error ? err.message : "S3 read failed",
+    );
   }
 
   if (!documentText.trim() && fallbackText.trim()) {
@@ -80,12 +97,27 @@ export async function ingestDocumentChunks(
       chunksStored: 0,
       chunksSkipped: 0,
       skippedReasons: ["no text to chunk"],
+      warnings,
+      pageCount,
     };
   }
 
   let chunksStored = 0;
   let chunksSkipped = 0;
   const skippedReasons: string[] = [];
+
+  // Embed in batches: one provider request per batch instead of one per
+  // chunk. A 40 page contract is roughly 60 chunks.
+  const embedded = await embedBatch(pieces);
+  if (!embedded.ok) {
+    return {
+      chunksStored: 0,
+      chunksSkipped: pieces.length,
+      skippedReasons: [`${embedded.reason}: ${embedded.detail ?? "batch failed"}`],
+      warnings,
+      pageCount,
+    };
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT set_config('app.user_id', ${userId}, true)`;
@@ -94,15 +126,15 @@ export async function ingestDocumentChunks(
       WHERE policy_id = ${policyId}::uuid AND user_id = ${userId}::uuid
     `;
 
-    for (const content of pieces) {
-      const outcome = await embed(content);
-      if (!outcome.ok) {
+    for (const [index, content] of pieces.entries()) {
+      const vector = embedded.vectors[index];
+      if (!vector) {
         chunksSkipped += 1;
-        skippedReasons.push(`${outcome.reason}: ${content.slice(0, 48)}…`);
+        skippedReasons.push(`missing vector: ${content.slice(0, 48)}…`);
         continue;
       }
 
-      const embedding = vectorLiteral(outcome.vector);
+      const embedding = vectorLiteral(vector);
       await tx.$executeRaw`
         INSERT INTO document_chunks (user_id, policy_id, content, embedding)
         VALUES (
@@ -116,5 +148,5 @@ export async function ingestDocumentChunks(
     }
   });
 
-  return { chunksStored, chunksSkipped, skippedReasons };
+  return { chunksStored, chunksSkipped, skippedReasons, warnings, pageCount };
 }

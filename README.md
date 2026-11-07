@@ -287,6 +287,28 @@ curl -X POST http://localhost:3000/v1/copilot/query \
 ```
 *Result: HTTP 422 `WPIG_SPECIFIC_SECURITY_BLOCK` — specific security advice blocked; macro educational allocation preserved.*
 
+### 3. Voice agent reads the uploaded PDF (direct, not RAG)
+The ElevenLabs agent gets the policy text through two client tools:
+`list_documents` and `read_document`. The API extracts the real page text from
+the vault on demand — no embeddings, no vector search.
+
+```bash
+# Which documents are in the vault?
+curl "http://localhost:3001/v1/documents?userId=00000000-0000-4000-8000-000000000001"
+
+# Read pages 1-3 straight from the stored PDF
+curl -X POST http://localhost:3001/v1/documents/read \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "00000000-0000-4000-8000-000000000001",
+    "pageFrom": 1,
+    "pageTo": 3
+  }'
+```
+
+Setup of the two tools in the ElevenLabs dashboard (names, JSON schema,
+suggested agent prompt): [app/src/voice/ELEVENLABS_TOOLS.md](./app/src/voice/ELEVENLABS_TOOLS.md).
+
 ---
 
 ## 🏆 Hackathon Team & Vision

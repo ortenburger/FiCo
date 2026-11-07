@@ -90,6 +90,13 @@ enum JournalEntryStatus {
 
 // ─── 1. Identity & Mandator Layer ────────────────────────────────────────────
 
+/// Cooperative guild badge role (GAMIFICATION.md §7 — no leaderboards by net worth)
+enum GuildRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 model User {
   id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email            String           @unique @db.VarChar(255)
@@ -98,15 +105,17 @@ model User {
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  consents              BankConsent[]
-  accounts              Account[]
-  policies              InsurancePolicy[]
-  allocationProfile     AllocationProfile?
-  userProfile           UserProfile?
-  journalEntries        JournalEntry[]
-  policySwitchCases     PolicySwitchCase[]
-  gamificationProfile   UserGamificationProfile?
-  weeklySummaries       WeeklySummary[]
+  consents            BankConsent[]
+  accounts            Account[]
+  policies            InsurancePolicy[]
+  allocationProfile   AllocationProfile?
+  userProfile         UserProfile?
+  journalEntries      JournalEntry[]
+  policySwitchCases   PolicySwitchCase[]
+  gamificationProfile UserGamificationProfile?
+  weeklySummaries     WeeklySummary[]
+  guildMemberships    GuildMember[]
+  gamificationAwards  GamificationAward[]
 
   @@map("users")
 }
@@ -330,7 +339,7 @@ model AdvisoryFeeInvoice {
   @@map("advisory_fee_invoices")
 }
 
-// ─── 5. Gamification (decoupled from ledger) ─────────────────────────────────
+// ─── 5. Gamification Layer (GAMIFICATION.md §8 — decoupled from the ledger) ──
 
 model UserGamificationProfile {
   id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -338,16 +347,35 @@ model UserGamificationProfile {
   currentStreakWeeks Int       @default(0) @map("current_streak_weeks")
   longestStreakWeeks Int       @default(0) @map("longest_streak_weeks")
   lastCheckInDate    DateTime? @map("last_check_in_date") @db.Timestamptz(6)
+  /// Freezes are EARNED through responsible behavior — never bought (§2, no pay-to-win)
   streakFreezeCount  Int       @default(1) @map("streak_freeze_count")
   totalXp            Int       @default(0) @map("total_xp")
   currentLevel       Int       @default(1) @map("current_level")
   completedSnacks    Json      @default("[]") @map("completed_snacks")
   badges             Json      @default("[]")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user   User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_gamification_profiles")
+}
+
+/// Append-only award journal — source of truth for XP idempotency (eventId dedupe)
+model GamificationAward {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  eventId   String?  @map("event_id") @db.VarChar(128)
+  eventType String   @map("event_type") @db.VarChar(64)
+  xpAwarded Int      @map("xp_awarded")
+  meta      Json?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("user_gamification_profiles")
+  @@unique([userId, eventId], name: "uq_gamification_awards_user_event")
+  @@index([userId])
+  @@map("gamification_awards")
 }
 
 model WeeklySummary {
@@ -355,22 +383,22 @@ model WeeklySummary {
   userId          String   @map("user_id") @db.Uuid
   weekNumber      Int      @map("week_number")
   year            Int
-  savingsTotal    Decimal  @map("savings_total") @db.Decimal(12, 2)
-  feesAvoided     Decimal  @map("fees_avoided") @db.Decimal(12, 2)
-  xpEarned        Int      @map("xp_earned")
+  savingsTotal    Decimal  @default(0) @map("savings_total") @db.Decimal(12, 2)
+  feesAvoided     Decimal  @default(0) @map("fees_avoided") @db.Decimal(12, 2)
+  xpEarned        Int      @default(0) @map("xp_earned")
   microHabitStory Json     @map("micro_habit_story")
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, year, weekNumber])
+  @@unique([userId, weekNumber, year], name: "uq_weekly_summaries_user_week_year")
   @@map("weekly_summaries")
 }
 
 model FinancialSnack {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug      String   @unique @db.VarChar(100)
-  category  String   @db.VarChar(50)
+  category  String   @db.VarChar(50) // INVESTING | INSURANCE | ALTERSVORSORGE | HABITS
   title     String   @db.VarChar(255)
   content   Json
   quiz      Json
@@ -378,4 +406,32 @@ model FinancialSnack {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("financial_snacks")
+}
+
+model Guild {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(255)
+  /// URL-safe identifier, e.g. "stuttgart-founders-guild"
+  slug        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  members GuildMember[]
+
+  @@map("guilds")
+}
+
+model GuildMember {
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guildId  String    @map("guild_id") @db.Uuid
+  userId   String    @map("user_id") @db.Uuid
+  role     GuildRole @default(MEMBER)
+  joinedAt DateTime  @default(now()) @map("joined_at") @db.Timestamptz(6)
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId], name: "uq_guild_members_guild_user")
+  @@index([userId])
+  @@map("guild_members")
 }

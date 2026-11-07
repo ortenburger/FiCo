@@ -218,6 +218,164 @@ export async function askCopilot(question: string): Promise<string> {
   return "Macro allocation analysis only. Verify any portfolio changes with your broker.";
 }
 
+// ─── Document vault read (direct text, not RAG) ─────────────────────────────
+
+export type DocumentSummary = {
+  policyId: string;
+  fileName: string | null;
+  providerName: string;
+  policyNumber: string | null;
+  policyType: string;
+  documentStatus: string;
+  uploadedAt: string;
+};
+
+export type ReadDocumentParams = {
+  policyId?: string;
+  document?: string;
+  page?: number;
+  pageFrom?: number;
+  pageTo?: number;
+  query?: string;
+};
+
+export type DocumentReadResult =
+  | { ok: true; kind: "list"; documents: DocumentSummary[]; hint: string }
+  | {
+      ok: true;
+      kind: "pages";
+      document: DocumentSummary & { pageCount: number; source: string };
+      pages: Array<{ page: number; text: string }>;
+      firstPage: number;
+      lastPage: number;
+      nextPage: number | null;
+      hint: string;
+    }
+  | {
+      ok: true;
+      kind: "matches";
+      document: DocumentSummary & { pageCount: number; source: string };
+      query: string;
+      matches: Array<{ page: number; snippet: string }>;
+      hint: string;
+    }
+  | { ok: false; message: string };
+
+type ApiResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
+
+async function fetchApi<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<ApiResult<T>> {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(path), init);
+  } catch {
+    return {
+      ok: false,
+      message:
+        "Die FiCo-Engine ist nicht erreichbar. Prüfe, ob der API-Server läuft.",
+    };
+  }
+
+  const payload = (await response.json().catch(() => null)) as
+    | (T & { error?: string; detail?: string })
+    | null;
+
+  if (!response.ok) {
+    const detail = payload?.detail ? ` (${payload.detail})` : "";
+    return {
+      ok: false,
+      message:
+        (payload?.error ?? `Anfrage fehlgeschlagen (HTTP ${response.status})`) +
+        detail,
+    };
+  }
+
+  return { ok: true, data: payload as T };
+}
+
+/** Lists the user's uploaded policy documents so the agent can pick one. */
+export async function listDocuments(
+  userId: string,
+): Promise<DocumentReadResult> {
+  const result = await fetchApi<{
+    count: number;
+    documents: DocumentSummary[];
+    hint: string;
+  }>(`/v1/documents?userId=${encodeURIComponent(userId)}`);
+
+  if (!result.ok) return result;
+  return {
+    ok: true,
+    kind: "list",
+    documents: result.data.documents,
+    hint: result.data.hint,
+  };
+}
+
+/**
+ * Reads a PDF page range (or searches) straight from the document vault.
+ * The request adds no embeddings — the API extracts the real page text.
+ */
+export async function readDocument(
+  userId: string,
+  params: ReadDocumentParams,
+): Promise<DocumentReadResult> {
+  const body: Record<string, unknown> = { userId };
+  if (params.policyId) body.policyId = params.policyId;
+  if (params.document) body.document = params.document;
+  if (params.page !== undefined) body.page = params.page;
+  if (params.pageFrom !== undefined) body.pageFrom = params.pageFrom;
+  if (params.pageTo !== undefined) body.pageTo = params.pageTo;
+  if (params.query) body.query = params.query;
+
+  const result = await fetchApi<Record<string, unknown>>(
+    "/v1/documents/read",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+
+  if (!result.ok) return result;
+  const payload = result.data;
+
+  if (Array.isArray(payload.matches)) {
+    return {
+      ok: true,
+      kind: "matches",
+      document: payload.document as DocumentSummary & {
+        pageCount: number;
+        source: string;
+      },
+      query: String(payload.query ?? ""),
+      matches: payload.matches as Array<{ page: number; snippet: string }>,
+      hint: String(payload.hint ?? ""),
+    };
+  }
+
+  return {
+    ok: true,
+    kind: "pages",
+    document: payload.document as DocumentSummary & {
+      pageCount: number;
+      source: string;
+    },
+    pages: (payload.pages ?? []) as Array<{ page: number; text: string }>,
+    firstPage: Number(payload.firstPage ?? 1),
+    lastPage: Number(payload.lastPage ?? 1),
+    nextPage:
+      payload.nextPage === null || payload.nextPage === undefined
+        ? null
+        : Number(payload.nextPage),
+    hint: String(payload.hint ?? ""),
+  };
+}
+
 async function safeJson<T>(
   path: string,
   init?: RequestInit,

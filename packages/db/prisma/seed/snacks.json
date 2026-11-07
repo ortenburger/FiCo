@@ -1,0 +1,84 @@
+[
+  {
+    "slug": "etf-rebalancing-checkpoint",
+    "category": "INVESTING",
+    "title": "The ETF Rebalancing Checkpoint",
+    "content": {
+      "hook": "Why should I care about rebalancing if stocks keep going up?",
+      "bite": "Risk drift happens quietly over time. In a multi-asset portfolio, equities grow faster than cash or bonds, subtly turning a moderate investor into an aggressive gambler right before a market dip.",
+      "analogy": "Imagine your portfolio is an RPG squad: 70% Global Equities are your Attack, 30% Bonds/Money Market your Defense. After a big rally your squad drifts to 85% Attack / 15% Defense — riskier than you wanted!",
+      "takeaway": "Rebalancing = selling a bit of what ran hot to replenish what lagged. Disciplined profit-taking without emotional FOMO."
+    },
+    "quiz": {
+      "question": "Your equity share spiked from 70% to 85% during a bull market. What does rebalancing do?",
+      "options": [
+        { "id": "A", "text": "Double down on high-beta tech stocks", "correct": false, "explanation": "That increases risk drift — the opposite of rebalancing. −5 XP." },
+        { "id": "B", "text": "Sell 15% of equities to replenish the shield buffer", "correct": true, "explanation": "Sell high on what ran hot, buy the lagged side. +25 XP." },
+        { "id": "C", "text": "Panic sell everything into the checking account", "correct": false, "explanation": "Panic selling locks in the rally's risk at the worst timing. −5 XP." }
+      ]
+    },
+    "xpReward": 25
+  },
+  {
+    "slug": "silent-wealth-killer-ter",
+    "category": "INVESTING",
+    "title": "The Silent Wealth Killer — what a 1.5% fund fee REALLY costs",
+    "content": {
+      "hook": "A 1.5% management fee sounds tiny. What's 1.5 out of 100?",
+      "bite": "Over a 35-year horizon with €200/month at 7% gross: at 0.20% TER (clean ETF) you end with ≈ €335,000 — at 1.80% TER (traditional active bank fund) only ≈ €212,000. The 'innocent' 1.6% delta devours €123,000+, over 36% of your lifetime wealth.",
+      "simulator": { "type": "ter-drag", "minTer": 0.2, "maxTer": 2.5, "initial": 200, "monthly": 200, "years": 35, "grossReturn": 7 }
+    },
+    "quiz": {
+      "question": "Which TER change has the biggest impact on your wealth over 35 years?",
+      "options": [
+        { "id": "A", "text": "Lowering TER from 2.5% to 0.2% in an Altersvorsorgedepot", "correct": true, "explanation": "Fee drag compounds: the difference over 35 years can exceed a third of total wealth. +25 XP." },
+        { "id": "B", "text": "None — 1.5% vs 0.2% is rounding noise", "correct": false, "explanation": "Compounding turns 'rounding noise' into six figures lost. −5 XP." },
+        { "id": "C", "text": "Only matters if the ETF underperforms", "correct": false, "explanation": "TER is charged regardless of performance — it compounds in both directions. −5 XP." }
+      ]
+    },
+    "xpReward": 25
+  },
+  {
+    "slug": "privathaftpflicht-liability",
+    "category": "INSURANCE",
+    "title": "Liability Demystified — Privathaftpflicht vs Kfz-Haftpflicht",
+    "content": {
+      "hook": "Is Car Liability legally mandatory but Bicycle Liability isn't — why?",
+      "legalReality": "§ 823 BGB: you are personally liable with 100% of current assets AND all future earnings, for life, without limit.",
+      "comparison": [
+        { "dimension": "Legally mandatory", "car": "YES (Pflichtversicherungsgesetz)", "personal": "NO (voluntary, but existential)" },
+        { "dimension": "Why the distinction", "car": "Betriebsgefahr: massive kinetic energy — the state protects third-party victims", "personal": "Bikes/pedestrians: lower statistical kinetic energy, no state mandate" },
+        { "dimension": "The catastrophic trap", "car": "Uninsured → the state seizes your license plate immediately", "personal": "Bike + phone + ICE crash → €3,000,000+ out of pocket for life" }
+      ],
+      "takeaway": "A €3–5/month Privathaftpflicht is the cheapest anti-ruin shield in the world. Check for modern net-tariff clauses (grobe Fahrlässigkeit, loss of keys)."
+    },
+    "quiz": {
+      "question": "Why is Kfz-Haftpflicht mandatory by law but Privathaftpflicht isn't?",
+      "options": [
+        { "id": "A", "text": "Cars carry massive kinetic energy — third-party victims need guaranteed protection", "correct": true, "explanation": "Betriebsgefahr: the state protects victims, not you. Your own cover is voluntary. +25 XP." },
+        { "id": "B", "text": "Bicycles can't cause any relevant damage", "correct": false, "explanation": "A bike crash into an ICE train can cost €3M+. −5 XP." },
+        { "id": "C", "text": "The law was written before bicycles existed", "correct": false, "explanation": "It's about kinetic energy and victims, not history. −5 XP." }
+      ]
+    },
+    "xpReward": 25
+  },
+  {
+    "slug": "altersvorsorgedepot-unpacked",
+    "category": "ALTERSVORSORGE",
+    "title": "The Altersvorsorgedepot Unpacked — why Riester failed, and the depot is different",
+    "content": {
+      "hook": "Why did Riester fail, and why is the new depot different?",
+      "bite": "Old Riester plans legally forced a 100% nominal capital guarantee. In a zero-interest era, providers parked money in negative-yielding bonds instead of equities. The new Altersvorsorgedepot drops that restrictive guarantee: 100% global equity compounding, government matching and tax deferral stay.",
+      "edgeTargets": { "no-comp": 0.6, "with-comp": 0.4, "voluntaryPrize": true }
+    },
+    "quiz": {
+      "question": "What made Riester contracts fail young savers during the zero-interest era?",
+      "options": [
+        { "id": "A", "text": "The legal 100% capital guarantee pushed providers into negative-yielding bonds instead of equities", "correct": true, "explanation": "Guarantee ≈ bonds only ≈ no compounding power for 40 years. +25 XP." },
+        { "id": "B", "text": "Riester returns were taxed twice", "correct": false, "explanation": "The killer was the guarantee-driven asset allocation, not taxes. −5 XP." },
+        { "id": "C", "text": "You could only pay in during December", "correct": false, "explanation": "Contributions work all year — the guarantee is the problem. −5 XP." }
+      ]
+    },
+    "xpReward": 25
+  }
+]

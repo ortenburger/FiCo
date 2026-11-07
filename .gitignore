@@ -12,3 +12,8 @@ packages/db/prisma/*.db-journal
 .idea/
 .vscode/
 graphify-out/
+
+# pitch motion: keep the encoded video + poster, drop the frame dumps
+pitch/out/frames/
+pitch/out/stills/
+pitch/out/check/
