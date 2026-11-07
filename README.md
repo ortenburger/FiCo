@@ -4,6 +4,7 @@
 > *Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.*
 
 [![Founders Hackathon 2026](https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square)](https://github.com)
+[![Gamification](https://img.shields.io/badge/Gamification-Duolingo%20Style%20%7C%20Weekly%20Streaks-FF9F43?style=flat-square)](./GAMIFICATION.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square)](https://nodejs.org/)
 [![Vitest](https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen?style=flat-square)](https://vitest.dev/)
@@ -18,7 +19,7 @@ The world of German pensions and insurance (*Altersvorsorge*, *Lebensversicherun
 - **Hidden Fees & Commission Traps:** Legacy products (Riester, Rürup, gross life insurance) silently eat up to **30–40% of returns** via front-loaded commissions (*Zillmerung*) and inflated annual TERs (>2–3%).
 - **The Inaction Trap:** Because it feels boring and complicated, millions of young people postpone retirement planning, compounding the demographic pension crisis (*Rentenlücke*).
 
-### 🎯 The Wedge: Germany's New *Altersvorsorgedepot* (2027)
+### 🎯 The Wedge: Germany's New *Altersvorsorgedepot* (2026)
 The German pension reform brings a historic paradigm shift: the **Altersvorsorgedepot** (subsidized, tax-advantaged equity/ETF pension accounts with state matching and tax deferral). 
 
 **FiCo turns this reform into the ultimate wake-up call and catalyst.**  
@@ -29,6 +30,8 @@ Instead of reading 40 pages of boring legal texts, users upload their existing p
 ---
 
 ## 🎮 Gamification Core: How Users Experience FiCo
+
+> 📖 **Deep Dive:** Read [GAMIFICATION.md](./GAMIFICATION.md) for full specs on our Duolingo-inspired habit loops, streak freezes, weekly recap stories, and agentic micro-savings formulas.
 
 ```
                ┌────────────────────────┐
@@ -48,7 +51,7 @@ Instead of reading 40 pages of boring legal texts, users upload their existing p
           ║   ARENA: Altersvorsorgedepot     ║
           ║         vs. Legacy Plan          ║
           ║  Interactive 40-year simulation  ║
-          ║  "You reclaim €112,400 in fees!" ║
+          ║  "You reclaim €112,400 in fees!  ║
           ╚════════════┬═════════════════════╝
                        │
                        ▼
@@ -80,6 +83,18 @@ Financial discipline, transformed into a level progression:
 
 ### 4. 🛡️ Net-Tariff Switch Without Kickbacks
 When replacing outdated coverage, FiCo routes users to unbundled **net tariffs** (*Nettotarife*). No hidden commissions, no broker kickbacks (§ 48b VAG compliant), and complete transparency through fee-only advisory invoicing.
+
+### 5. 🔥 Duolingo-Style Weekly Streaks & The Sunday Money Ritual
+Daily streaks in finance cause fatigue; financial cycles move weekly and monthly. FiCo enforces a **1x per week minimal threshold**:
+- **The Sunday Money Ritual (2 min):** Review automated cashflow, claim weekly XP, maintain the streak flame, and allocate free surplus.
+- **Earned Streak Freezes:** Streak shields are unlocked through good financial milestones (e.g. maintaining the emergency fund), never bought with real cash.
+- **Weekly Money Wrapped:** A Spotify/Duolingo-style story card summarizing weekly cashflow health, XP gained, and cumulative fee damage inflicted on legacy monsters.
+
+### 6. 🤖 Agentic Cross-Domain Habits: "Bike vs. Transit" & Smart Energy
+Autonomous background agents observe external data sources and calculate their real long-term compounding impact in the Altersvorsorgedepot:
+- **"Bike instead of Transit" Agent:** Commuting by bike 3 days a week saves ~€91/month. FiCo projects: *Allocated to your Altersvorsorgedepot at 7% over 35 years = **€164,000+** at retirement!*
+- **Smart Power Agent (Tibber / Smart Meters):** Detects vampire standby loads (>100W at night) and dynamic tariff off-peak savings.
+- **Zombie Subscription Sweeper:** Detects forgotten SaaS/streaming subscriptions, drafting instant cancellation letters and redirecting the cashflow.
 
 ---
 
@@ -151,30 +166,14 @@ Unlike generic AI wrappers, FiCo enforces hard regulatory invariants at the core
 
 ```
 packages/
-├── aisp/         # finAPI + Tink + wealthAPI AISP connectors (read-only), HMAC, classifier
-├── datasources/  # Canonical registry: Open Finance + all finexpert.de/schnittstellen
+├── aisp/         # PSD2/PSD3 AISP adapter, HMAC webhooks, recurring transaction classifier
 ├── api/          # High-performance Fastify edge API (synchronous, lightweight)
 ├── db/           # Prisma schema & PostgreSQL migrations (double-entry ledger models)
 ├── ledger/       # Append-only double-entry OCC engine + deterministic cash waterfall
-├── policy/       # OCR heuristics, economic gate, finexpert Schnittstellen clients
+├── policy/       # Local OCR heuristics, economic circuit breakers, net-policy evaluation
 ├── regulatory/   # WpIG investment firewall, VAG commission invariants, VVG state machine
 └── workers/      # BullMQ background workers for async document & upstream operations
 ```
-
-### Datasources
-
-| ID | Source | Role |
-| --- | --- | --- |
-| `FINAPI` / `TINK` | Open Finance AISP | Bank accounts & transactions (no PISP) |
-| `WEALTHAPI` | Wealth | Depot snapshots |
-| `FINEXPERT_REST` | [finexpert Schnittstellen](https://www.finexpert.de/schnittstellen/) | REST API (kunden, risikocheck) |
-| `BLAU_DIREKT` | finexpert | Native pool two-way sync / Abschlussstrecke |
-| `BCA` | finexpert | BCA Bestand / CRM / Dokumente |
-| `FRANKE_BORNBERG` | finexpert | fb>vertragscheck synopsis |
-| `TAA` | finexpert | Tarifrechner → Beratungskonzept |
-| `MVP` | finexpert | Maklerverwaltungsprogramm sync |
-
-`GET /v1/datasources` returns runtime config status for all nine.
 
 ---
 
@@ -251,7 +250,7 @@ Verify that illegal investment advisory queries are intercepted:
 ```bash
 curl -X POST http://localhost:3000/v1/copilot/query \
   -H "Content-Type: application/json" \
-  -d '{ "query": "Should I sell my Allianz pension and buy A1JX52?" }'
+  -d '{ "query": "Should I sell my Allianz pension and buy A1JX52?" }'\
 ```
 *Result: HTTP 422 `WPIG_SPECIFIC_SECURITY_BLOCK` — specific security advice blocked; macro educational allocation preserved.*
 
