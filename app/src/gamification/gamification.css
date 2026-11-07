@@ -120,8 +120,8 @@
 }
 
 .checkin-btn {
-  background: #ffffff;
-  color: #1e3a8a;
+  background: rgba(255,255,255,0.045);
+  color: #9bbcff;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
@@ -134,7 +134,7 @@
 
 .checkin-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: #eff6ff;
+  background: rgba(37,99,235,0.16);
 }
 
 .checkin-btn:disabled {
@@ -144,8 +144,8 @@
 
 /* Questro Progress Rings Card */
 .rings-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   padding: 22px;
   box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.06);
@@ -165,8 +165,8 @@
 
 /* Weekly Money Wrapped Card (§3) */
 .wrapped-card {
-  background: #ffffff;
-  border: 1px solid #bfdbfe;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(123,164,255,0.35);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 4px 16px -4px rgba(37, 99, 235, 0.08);
@@ -182,16 +182,16 @@
 .wrapped-tile {
   padding: 16px;
   border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.12);
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .wrapped-tile--highlight {
-  background: #eff6ff;
-  border-color: #bfdbfe;
+  background: rgba(37,99,235,0.16);
+  border-color: rgba(123,164,255,0.35);
 }
 
 .wrapped-tile-label {
@@ -199,18 +199,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748b;
+  color: rgba(255,255,255,0.55);
 }
 
 .wrapped-tile-value {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .wrapped-tile-sub {
   font-size: 0.78rem;
-  color: #475569;
+  color: rgba(255,255,255,0.7);
   line-height: 1.4;
 }
 
@@ -235,7 +235,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #1d4ed8;
+  color: #9bbcff;
   margin: 0 0 10px;
 }
 
@@ -252,18 +252,18 @@
   gap: 12px;
   padding: 13px 15px;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
   transition: all 140ms ease;
 }
 
 .quest-node.is-completed {
-  background: #f0fdf4;
-  border-color: #a7f3d0;
+  background: rgba(16,185,129,0.13);
+  border-color: rgba(16,185,129,0.35);
 }
 
 .quest-node.is-unlocked {
-  background: #eff6ff;
+  background: rgba(37,99,235,0.16);
   border-color: #93c5fd;
 }
 
@@ -285,13 +285,13 @@
 .quest-node-title {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #ffffff;
   margin: 0 0 3px;
 }
 
 .quest-node-detail {
   font-size: 0.76rem;
-  color: #64748b;
+  color: rgba(255,255,255,0.55);
   margin: 0;
   line-height: 1.4;
 }
@@ -307,9 +307,9 @@
 .snack-tab {
   padding: 6px 11px;
   border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #475569;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.055);
+  color: rgba(255,255,255,0.7);
   font-size: 0.76rem;
   font-weight: 650;
   cursor: pointer;
@@ -327,7 +327,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  color: #334155;
+  color: rgba(255,255,255,0.8);
   font-size: 0.82rem;
   line-height: 1.5;
 }
