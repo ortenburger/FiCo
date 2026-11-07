@@ -63,6 +63,14 @@ enum SubscriptionTier {
   ACTIVE_SUBSCRIBER
 }
 
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  REGISTERED_PARTNERSHIP
+}
+
 /// Net-carrier underwriting state machine (§ 63 VVG / Underwriting Chasm guard)
 enum PolicySwitchStatus {
   DRAFT
@@ -94,6 +102,7 @@ model User {
   accounts            Account[]
   policies            InsurancePolicy[]
   allocationProfile   AllocationProfile?
+  userProfile         UserProfile?
   journalEntries      JournalEntry[]
   policySwitchCases   PolicySwitchCase[]
 
@@ -291,6 +300,17 @@ model AllocationProfile {
   emergencyFundAccount Account? @relation("EmergencyFundAccount", fields: [emergencyFundAccountId], references: [id])
 
   @@map("allocation_profiles")
+}
+
+model UserProfile {
+  userId              String        @id @map("user_id") @db.Uuid
+  grossMonthlyIncome  Decimal       @map("gross_monthly_income") @db.Decimal(12, 2)
+  maritalStatus       MaritalStatus @map("marital_status")
+  updatedAt           DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
 }
 
 // ─── Advisory fee billing (§ 34d GewO / § 48b VAG — NO kickback ledger) ──────
