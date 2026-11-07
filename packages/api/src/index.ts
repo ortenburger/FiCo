@@ -252,7 +252,6 @@ await registerDocumentReadRoutes(app);
 await registerRetrievalRoutes(app);
 await registerDemoRoutes(app);
 registerGamificationRoutes(app);
-registerGamificationRoutes(app);
 
 // Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback
 // first on macOS, so an IPv4-only listener is not reachable by every client.
