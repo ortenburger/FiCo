@@ -100,6 +100,23 @@ export type WeeklyMoneyWrappedDto = {
   };
 };
 
+/** Cooperative guild card (mirrors `@fico/gamification` GuildMetrics). */
+export type GuildMetricsDto = {
+  debtEliminatedEur: number;
+  feesAvoidedEur: number;
+  combinedStreakWeeks: number;
+  snacksMastered: number;
+};
+
+export type GuildDto = {
+  id: string;
+  name: string;
+  slug: string;
+  memberCount: number;
+  metrics: GuildMetricsDto;
+  activePerk: string;
+};
+
 /** One hub load, whatever the data source. */
 export type GamificationHubData = {
   dataSource: "api" | "demo";
@@ -107,6 +124,7 @@ export type GamificationHubData = {
   wrapped: WeeklyMoneyWrappedDto;
   snacks: FinancialSnackDto[];
   chapters: QuestChapterDto[];
+  guild: GuildDto;
 };
 
 /** Result of answering a snack quiz. */

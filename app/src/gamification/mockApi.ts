@@ -1,9 +1,14 @@
+import {
+  computeGuildMetrics,
+  type GuildMemberStats,
+} from "../../../packages/gamification/src/guilds.ts";
 import type {
   CheckInResult,
   FinancialSnackDto,
   FlameTier,
   GamificationHubData,
   GamificationProfileDto,
+  GuildDto,
   QuestChapterDto,
   SnackAnswerResult,
   WeeklyMoneyWrappedDto,
@@ -282,6 +287,49 @@ const DEMO_WRAPPED: WeeklyMoneyWrappedDto = {
   },
 };
 
+/** Stuttgart Founders Guild — metrics via `@fico/gamification` computeGuildMetrics. */
+const DEMO_GUILD_MEMBERS: GuildMemberStats[] = [
+  {
+    userId: "member-lena",
+    debtEliminatedEur: 1200,
+    feesAvoidedEur: 3800,
+    currentStreakWeeks: 14,
+    snacksMastered: 2,
+  },
+  {
+    userId: "member-marco",
+    debtEliminatedEur: 2400,
+    feesAvoidedEur: 4100,
+    currentStreakWeeks: 8,
+    snacksMastered: 3,
+  },
+  {
+    userId: "member-sara",
+    debtEliminatedEur: 1800,
+    feesAvoidedEur: 3500,
+    currentStreakWeeks: 9,
+    snacksMastered: 4,
+  },
+  {
+    userId: "member-jonas",
+    debtEliminatedEur: 900,
+    feesAvoidedEur: 3400,
+    currentStreakWeeks: 7,
+    snacksMastered: 2,
+  },
+];
+
+const DEMO_GUILD_METRICS = computeGuildMetrics(DEMO_GUILD_MEMBERS);
+
+export const DEMO_GUILD: GuildDto = {
+  id: "guild-stuttgart-founders",
+  name: "Stuttgart Founders Guild 🛡️",
+  slug: "stuttgart-founders",
+  memberCount: DEMO_GUILD_MEMBERS.length,
+  metrics: DEMO_GUILD_METRICS,
+  activePerk: "1.1x XP Multiplier Active for all members",
+};
+
 const DEMO_CHAPTERS: QuestChapterDto[] = [
   {
     chapter: 1,
@@ -454,6 +502,7 @@ export async function loadGamificationHub(userId: string): Promise<GamificationH
     wrapped,
     snacks,
     chapters: DEMO_CHAPTERS,
+    guild: DEMO_GUILD,
   };
 }
 
@@ -500,4 +549,5 @@ export const DEMO_CONTENT = {
   snacks: DEMO_SNACKS,
   wrapped: DEMO_WRAPPED,
   chapters: DEMO_CHAPTERS,
+  guild: DEMO_GUILD,
 } as const;

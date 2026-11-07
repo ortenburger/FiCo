@@ -18,9 +18,13 @@ import {
   submitSnackAnswer,
   xpFloors,
 } from "./mockApi";
+import { BossBattleCard } from "./BossBattleCard";
+import { DepotShockSlider } from "./DepotShockSlider";
+import { GuildCard } from "./GuildCard";
 import type {
   FinancialSnackDto,
   GamificationProfileDto,
+  GuildDto,
   QuestChapterDto,
   WeeklyMoneyWrappedDto,
 } from "./types";
@@ -46,6 +50,7 @@ export function GamificationHub({
   const [wrapped, setWrapped] = useState<WeeklyMoneyWrappedDto | null>(null);
   const [snacks, setSnacks] = useState<FinancialSnackDto[]>([]);
   const [chapters, setChapters] = useState<QuestChapterDto[]>([]);
+  const [guild, setGuild] = useState<GuildDto | null>(null);
 
   const [selectedSnackIdx, setSelectedSnackIdx] = useState(0);
   const [snackAnswers, setSnackAnswers] = useState<
@@ -63,6 +68,7 @@ export function GamificationHub({
       setWrapped(hub.wrapped);
       setSnacks(hub.snacks);
       setChapters(hub.chapters);
+      setGuild(hub.guild);
       onXpChange?.(hub.profile.totalXp, hub.profile.currentStreakWeeks);
     });
     return () => {
@@ -146,6 +152,17 @@ export function GamificationHub({
     }
   };
 
+  const handleBossStrike = (xpGain: number) => {
+    applyXpDelta(xpGain);
+    setToast({
+      title: "💥 CRITICAL HIT — Fee Boss staggered!",
+      description: `Nettotarif Switch landed (−€354 HP). +${xpGain} XP.`,
+      type: "milestone",
+      reward: { xp: xpGain },
+      showConfetti: true,
+    });
+  };
+
   const handleCompleteQuest = (chapterIdx: number, questId: string) => {
     const chapter = chapters[chapterIdx];
     const quest = chapter?.quests.find((q) => q.id === questId);
@@ -188,7 +205,7 @@ export function GamificationHub({
     [chapters],
   );
 
-  if (!profile || !wrapped) {
+  if (!profile || !wrapped || !guild) {
     return (
       <div className="panel">
         <p style={{ margin: 0, color: "#64748b" }}>
@@ -372,13 +389,14 @@ export function GamificationHub({
             </div>
           </div>
 
-          <div className="wrapped-tile">
+          <div className="wrapped-tile wrapped-tile--boss">
             <span className="wrapped-tile-label">🥊 Boss Damage Report</span>
-            <div className="wrapped-tile-value" style={{ color: "#e11d48" }}>
+            <div className="wrapped-tile-value" style={{ color: "#fb7185" }}>
               −{euroFmt.format(wrapped.bossDamage.damageThisWeek)} Gebühren
             </div>
             <div className="wrapped-tile-sub">
-              Schaden an „{wrapped.bossDamage.monster}“ durch Nettotarif-Switch
+              „{wrapped.bossDamage.monster}“ · strike below to land the
+              Nettotarif critical hit
             </div>
           </div>
 
@@ -396,6 +414,13 @@ export function GamificationHub({
           </div>
         </div>
       </section>
+
+      <DepotShockSlider />
+
+      <BossBattleCard
+        monsterName={wrapped.bossDamage.monster}
+        onStrike={handleBossStrike}
+      />
 
       {/* ROW 3: SKILL TREE (§6) & 4 FINANCIAL SNACKS (§5) */}
       <div className="gamification-bottom-grid">
@@ -574,6 +599,8 @@ export function GamificationHub({
           ) : null}
         </section>
       </div>
+
+      <GuildCard guild={guild} />
     </div>
   );
 }
