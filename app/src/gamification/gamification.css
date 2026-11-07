@@ -1,0 +1,350 @@
+/* ==========================================================================
+   FiCo Gamification Hub — Clean Light & Royal Blue Fintech Theme
+   ========================================================================== */
+
+.gamification-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.gamification-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* Streak Flame & Level Progress Card */
+.flame-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 14px 32px -10px rgba(37, 99, 235, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.flame-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.flame-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.flame-orb {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.flame-headline {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.flame-sub {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: #bfdbfe;
+}
+
+.tier-ladder {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tier-step {
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: center;
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+.tier-step.is-reached {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #93c5fd;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.tier-step strong {
+  display: block;
+  font-size: 0.82rem;
+  margin-bottom: 2px;
+}
+
+.flame-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  flex-wrap: wrap;
+}
+
+.freeze-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.35);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+.checkin-btn {
+  background: #ffffff;
+  color: #1e3a8a;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.84rem;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.checkin-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #eff6ff;
+}
+
+.checkin-btn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+/* Questro Progress Rings Card */
+.rings-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.rings-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* Weekly Money Wrapped Card (§3) */
+.wrapped-card {
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px -4px rgba(37, 99, 235, 0.08);
+}
+
+.wrapped-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.wrapped-tile {
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wrapped-tile--highlight {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.wrapped-tile-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.wrapped-tile-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.wrapped-tile-sub {
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+/* Skill Tree (§6) & Snacks (§5) Split */
+.gamification-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.chapter-block {
+  margin-bottom: 18px;
+}
+
+.chapter-block:last-child {
+  margin-bottom: 0;
+}
+
+.chapter-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1d4ed8;
+  margin: 0 0 10px;
+}
+
+.quest-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quest-node {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  transition: all 140ms ease;
+}
+
+.quest-node.is-completed {
+  background: #f0fdf4;
+  border-color: #a7f3d0;
+}
+
+.quest-node.is-unlocked {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.quest-node.is-locked {
+  opacity: 0.65;
+}
+
+.quest-node-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.quest-emoji {
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.quest-node-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 3px;
+}
+
+.quest-node-detail {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Snack Selector Tabs */
+.snack-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.snack-tab {
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.snack-tab.is-active {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.snack-bite-list {
+  margin: 0 0 14px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #334155;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1080px) {
+  .gamification-top-grid,
+  .gamification-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wrapped-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .tier-ladder,
+  .wrapped-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
