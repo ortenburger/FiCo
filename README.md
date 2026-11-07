@@ -31,7 +31,7 @@ Instead of reading 40 pages of boring legal texts, users upload their existing p
 
 ## 🎮 Gamification Core: How Users Experience FiCo
 
-> 📖 **Deep Dive:** Read [GAMIFICATION.md](./GAMIFICATION.md) for full specs on our Duolingo-inspired habit loops, streak freezes, weekly recap stories, and agentic micro-savings formulas.
+> 📖 **Deep Dive:** Read [GAMIFICATION.md](./GAMIFICATION.md) for full specs on our Duolingo-inspired habit loops, streak freezes, weekly recap stories, bite-sized micro-learnings, and agentic micro-savings formulas.
 
 ```
                ┌────────────────────────┐
@@ -95,6 +95,12 @@ Autonomous background agents observe external data sources and calculate their r
 - **"Bike instead of Transit" Agent:** Commuting by bike 3 days a week saves ~€91/month. FiCo projects: *Allocated to your Altersvorsorgedepot at 7% over 35 years = **€164,000+** at retirement!*
 - **Smart Power Agent (Tibber / Smart Meters):** Detects vampire standby loads (>100W at night) and dynamic tariff off-peak savings.
 - **Zombie Subscription Sweeper:** Detects forgotten SaaS/streaming subscriptions, drafting instant cancellation letters and redirecting the cashflow.
+
+### 7. 🧠 Just-in-Time "Financial Snacks" (Micro-Learning)
+90-second interactive learning checkpoints sprinkled contextually into the journey:
+- **ETF Rebalancing:** Why portfolio drift turns moderate investors into accidental risk-takers without regular rebalancing.
+- **The 1.5% Fee Eye-Opener:** How a 1.6% management fee difference silently destroys €123,000+ (over 36% of total wealth) over 35 years vs. a clean ETF.
+- **Personal Liability Demystified:** Why car liability is legally mandatory under *Betriebsgefahr*, but personal liability is your most critical anti-ruin shield under § 823 BGB.
 
 ---
 
@@ -250,7 +256,7 @@ Verify that illegal investment advisory queries are intercepted:
 ```bash
 curl -X POST http://localhost:3000/v1/copilot/query \
   -H "Content-Type: application/json" \
-  -d '{ "query": "Should I sell my Allianz pension and buy A1JX52?" }'\
+  -d '{ "query": "Should I sell my Allianz pension and buy A1JX52?" }'
 ```
 *Result: HTTP 422 `WPIG_SPECIFIC_SECURITY_BLOCK` — specific security advice blocked; macro educational allocation preserved.*
 

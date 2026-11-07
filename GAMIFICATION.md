@@ -1,6 +1,6 @@
 # FiCo Gamification Architecture: Duolingo for Financial Sovereignty 🎮
 
-> *"Making personal finance as engaging as learning a language on Duolingo, turning abstract 40-year compound interest into tangible, weekly micro-wins."*
+> *"Making personal finance as engaging as learning a language on Duolingo, turning abstract 40-year compound interest into tangible, weekly micro-wins and bite-sized learnings."*
 
 ---
 
@@ -13,6 +13,7 @@ Traditional personal finance apps fail Gen Z and Millennials because they are:
 
 **FiCo adapts the proven behavioral psychology of Duolingo to finance:**
 - **Micro-Habits over Heavy Lifts:** Transforming financial literacy into bite-sized, 2-minute weekly interactions.
+- **Just-In-Time Micro-Learning ("Financial Snacks"):** 90-second myth-busters and interactive checkpoints sprinkled into the user journey.
 - **Positive Reinforcement:** Rewarding smart cashflow choices and fee reductions rather than shaming discretionary spending.
 - **Tangible Compounding:** Instantly converting everyday micro-savings (e.g. cycling to work, switching electricity tariffs) into real projected future wealth in the new **Altersvorsorgedepot**.
 - **Agentic Automation:** Background AI agents do the heavy number-crunching, surfacing only actionable, rewarding decisions.
@@ -30,9 +31,10 @@ Therefore, FiCo introduces the **Weekly Streak (The Sunday Money Ritual)**.
        │             THE SUNDAY MONEY RITUAL (2 min)            │
        │                                                        │
        │  1. Review Weekly Recap (Story/Slide Format)           │
-       │  2. Claim Weekly XP & Extend Streak Flame 🔥           │
-       │  3. Agentic Micro-Quest Validation                     │
-       │  4. Route Free Surplus via Cash Waterfall Engine       │
+       │  2. Bite-Sized Micro-Learning Snack (90 sec)          │
+       │  3. Claim Weekly XP & Extend Streak Flame 🔥           │
+       │  4. Agentic Micro-Quest Validation                     │
+       │  5. Route Free Surplus via Cash Waterfall Engine       │
        └────────────────────────────────────────────────────────┘
 ```
 
@@ -106,7 +108,67 @@ FiCo leverages autonomous background agents that observe cross-domain data feeds
 
 ---
 
-## 🌳 5. The Financial Skill Tree: RPG Progression
+## 🧠 5. Duolingo-Style Financial Checkpoints: Bite-Sized Micro-Learnings ("Financial Snacks")
+
+Rather than forcing users through boring 30-minute academy videos, FiCo breaks essential financial literacy into **60–90 second interactive cards** ("Financial Snacks") that appear contextually throughout the app.
+
+```
+      ┌────────────────────────────────────────────────────────┐
+      │  FINANCIAL SNACK #12 🍿                     +25 XP ⚡  │
+      │                                                        │
+      │  "Wait... what does REBALANCING an ETF actually mean?" │
+      │                                                        │
+      │  Imagine your portfolio is an RPG squad:              │
+      │  ⚔️ 70% Global Equities (Attack)                      │
+      │  🛡️ 30% Bonds / Money Market (Defense)                 │
+      │                                                        │
+      │  After a big market rally, your squad shifts to:       │
+      │  ⚔️ 85% Attack / 🛡️ 15% Defense.                       │
+      │                                                        │
+      │  Your risk is now way higher than you wanted!          │
+      │  👉 Rebalancing = selling a bit of what ran hot to     │
+      │     buy the dip on what lagged. Automatically selling  │
+      │     high and buying low without emotional FOMO.        │
+      │                                                        │
+      │  [ Quick Quiz: Test Your Understanding ➔ ]             │
+      └────────────────────────────────────────────────────────┘
+```
+
+### Real-World Learning Modules (Sprinkled In Just-in-Time)
+
+#### 🥪 Snack 1: The ETF Rebalancing Checkpoint
+- **The Question:** *"Why should I care about rebalancing if stocks keep going up?"*
+- **The Bite:** Explains how risk drift happens over time. In a multi-asset portfolio, equities grow faster than cash or bonds, subtly turning a moderate investor into an aggressive gambler right before a market dip. Rebalancing forces disciplined profit-taking.
+- **The Quiz:** *"Your equity share spiked from 70% to 85% during a bull market. What does rebalancing do?"*
+  - A) Double down on high-beta tech stocks *(Wrong! -5 XP)*
+  - B) Sell 15% of equities to replenish the shield buffer *(Correct! +25 XP)*
+  - C) Panic sell everything into checking account *(Wrong! -5 XP)*
+
+#### 🥪 Snack 2: The Silent Wealth Killer — "How much does a 1.5% ETF / Fund Fee REALLY cost?"
+- **The Myth:** *"A 1.5% management fee sounds tiny. What's 1.5 out of 100?"*
+- **The Eye-Opener Math:**
+  Over a 35-year investment horizon with €200/month at 7% gross return:
+  $$\text{At 0.20\% TER (Clean ETF in Altersvorsorgedepot): } \approx \mathbf{€335,000}$$
+  $$\text{At 1.80\% TER (Traditional Active Bank / Insurance Fund): } \approx \mathbf{€212,000}$$
+  - **The Damage:** That innocent-sounding 1.6% fee delta devoured **€123,000+** — over **36% of your total lifetime wealth**!
+- **Interactive Simulator:** A tactile slider where users drag the TER from 0.2% to 2.5% and watch the compound curve collapse in real time.
+
+#### 🥪 Snack 3: Liability Demystified — "Do I really need a Privathaftpflicht? Why is Car Liability legally mandatory but Bicycle isn't?"
+- **The Legal Reality (§ 823 BGB):** In Germany, you are personally liable for damages you cause with **100% of your current assets and all future earnings, for life, without limit!**
+- **The Comparison:**
+  | Dimension | Car Liability (*Kfz-Haftpflicht*) | Personal Liability (*Privathaftpflicht*) |
+  | --- | --- | --- |
+  | **Is it legally mandatory?** | **YES** (by law / *Pflichtversicherungsgesetz*) | **NO** (voluntary, but existential!) |
+  | **Why the distinction?** | Cars have inherent operational danger (*Betriebsgefahr*) with massive kinetic energy. The state protects third-party victims. | Bicycles & pedestrians have lower statistical kinetic energy, so the state does not mandate a policy. |
+  | **The Catastrophic Trap:** | If uninsured, the state seizes the car license plate immediately. | If you ride a bike, glance at your phone, and cause an ICE train or bus crash: **you owe €3,000,000+** out of pocket for life. |
+- **The Takeaway:** A €3–€5/month Privathaftpflicht is the cheapest "anti-ruin shield" in the world. FiCo checks whether your policy includes modern net-tariff clauses (like gross negligence / *grobe Fahrlässigkeit* and loss of keys).
+
+#### 🥪 Snack 4: The Altersvorsorgedepot Unpacked — "Why did Riester fail, and why is the new depot different?"
+- **The Bite:** Old Riester plans legally forced providers to offer a 100% nominal capital guarantee. In a zero-interest era, providers were forced to park your money in negative-yielding bonds rather than equities! The new **Altersvorsorgedepot** drops this restrictive guarantee, letting young people harness 100% global equity compounding while still enjoying government matching and tax deferral.
+
+---
+
+## 🌳 6. The Financial Skill Tree: RPG Progression
 
 Users progress along a visual **Skill Tree** structured into distinct Chapters:
 
@@ -143,7 +205,7 @@ Users progress along a visual **Skill Tree** structured into distinct Chapters:
 
 ---
 
-## 🤝 6. Cooperative Guilds (No Toxic Wealth Flexing)
+## 🤝 7. Cooperative Guilds (No Toxic Wealth Flexing)
 
 Most finance leaderboards fail because **displaying net worth creates shame and toxic comparisons**. 
 
@@ -153,11 +215,12 @@ FiCo uses **Cooperative Financial Guilds**:
   - Total High-Interest Debt Eliminated by the Guild: *€14,800*
   - Total Hidden Broker Fees Avoided: *€89,200*
   - Combined Weekly Streak: *38 Weeks*
+  - Financial Snacks Mastered: *142 Lessons Completed*
 - **Team Rewards:** Unlocking group badges and shared milestone celebrations.
 
 ---
 
-## 🛠️ 7. Technical Data Architecture
+## 🛠️ 8. Technical Data Architecture
 
 The gamification layer is fully decoupled from the core double-entry ledger to guarantee financial auditability:
 
@@ -195,6 +258,7 @@ model UserGamificationProfile {
   streakFreezeCount  Int       @default(1)
   totalXp            Int       @default(0)
   currentLevel       Int       @default(1)
+  completedSnacks    Json      @default("[]")
   badges             Json      @default("[]")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -213,6 +277,17 @@ model WeeklySummary {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model FinancialSnack {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String   @unique @db.VarChar(100)
+  category    String   @db.VarChar(50) // "INVESTING", "INSURANCE", "ALTERSVORSORGE", "HABITS"
+  title       String   @db.VarChar(255)
+  content     Json
+  quiz        Json
+  xpReward    Int      @default(25)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+}
 ```
 
 ---
@@ -220,5 +295,6 @@ model WeeklySummary {
 ## 🏁 Summary: Why This Wins Gen Z & Hackathons
 
 1. **Emotional Connection:** Changes personal finance from an intimidating chore into an empowering personal RPG.
-2. **Real Economic Impact:** Bridges the gap between micro-habits (cycling, smart power) and macro wealth (**Altersvorsorgedepot**).
-3. **Sustainable Engagement:** Weekly cadence prevents notification fatigue while building lifelong financial habits.
+2. **Just-in-Time Literacy:** Delivers practical financial enlightenment (ETF rebalancing, TER drag, liability pitfalls) in 90-second snacks.
+3. **Real Economic Impact:** Bridges the gap between micro-habits (cycling, smart power) and macro wealth (**Altersvorsorgedepot**).
+4. **Sustainable Engagement:** Weekly cadence prevents notification fatigue while building lifelong financial habits.
