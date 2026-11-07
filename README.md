@@ -18,7 +18,7 @@ The world of German pensions and insurance (*Altersvorsorge*, *Lebensversicherun
 - **Hidden Fees & Commission Traps:** Legacy products (Riester, Rürup, gross life insurance) silently eat up to **30–40% of returns** via front-loaded commissions (*Zillmerung*) and inflated annual TERs (>2–3%).
 - **The Inaction Trap:** Because it feels boring and complicated, millions of young people postpone retirement planning, compounding the demographic pension crisis (*Rentenlücke*).
 
-### 🎯 The Wedge: Germany's New *Altersvorsorgedepot* (2026)
+### 🎯 The Wedge: Germany's New *Altersvorsorgedepot* (2027)
 The German pension reform brings a historic paradigm shift: the **Altersvorsorgedepot** (subsidized, tax-advantaged equity/ETF pension accounts with state matching and tax deferral). 
 
 **FiCo turns this reform into the ultimate wake-up call and catalyst.**  
