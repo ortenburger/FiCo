@@ -1,4 +1,6 @@
+import "./env.js";
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { evaluateInvestmentQuery } from "@fico/regulatory";
 import { evaluateWaterfall } from "@fico/ledger";
 import { evaluateEconomicGate, type PolicyType } from "@fico/policy";
@@ -21,10 +23,20 @@ import {
   type NetTariffProviderId,
 } from "@fico/net-tariffs";
 import { z } from "zod";
+import { registerDocumentRoutes } from "./documents.js";
+import { registerProfileRoutes } from "./profile.js";
+import { registerRetrievalRoutes } from "./retrieval.js";
 
 const port = Number(process.env.API_PORT ?? 3000);
 
 const app = Fastify({ logger: true });
+
+// The Vite dev server runs on a different origin than the API, so the browser
+// needs an explicit CORS grant for the voice client tools to reach /v1/*.
+await app.register(cors, {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
+});
 
 app.get("/health", async () => ({
   status: "ok",
@@ -223,5 +235,9 @@ app.post("/v1/net-tariffs/applications/handoff", async (req) => {
     executionOnly: true,
   });
 });
+
+await registerProfileRoutes(app);
+await registerDocumentRoutes(app);
+await registerRetrievalRoutes(app);
 
 await app.listen({ port, host: "0.0.0.0" });

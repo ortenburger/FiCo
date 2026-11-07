@@ -10,6 +10,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@fastify/cors": "^11.4.1",
     "@fico/aisp": "workspace:*",
     "@fico/datasources": "workspace:*",
     "@fico/db": "workspace:*",
