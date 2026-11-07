@@ -387,6 +387,113 @@ export async function evaluatePolicyGateVoice(params: {
   ].join(" ");
 }
 
+export type DemoSnapshot = {
+  persona: {
+    userId: string;
+    email: string;
+    displayName: string;
+    age: number;
+    city: string;
+    subscriptionTier: string;
+    grossMonthlyIncome: string | null;
+    maritalStatus: string | null;
+    tagline: string;
+  };
+  accounts: Array<{
+    id: string;
+    type: string;
+    iban: string | null;
+    balanceAmount: string;
+    currency: string;
+  }>;
+  policies: Array<{
+    id: string;
+    providerName: string;
+    policyNumber: string;
+    policyType: string;
+    costStructure: string;
+    monthlyPremium: string;
+    startDate: string;
+    documentStatus: string;
+  }>;
+  waterfall: {
+    instruction: string;
+    rationale: string;
+    targetEmergencyBuffer: string;
+    currentLiquidReserve: string;
+    deficit: string;
+    surplus: string;
+  };
+  bossFight: {
+    name: string;
+    policyId: string;
+    monthlyPremium: string;
+    annualGross: string;
+    annualNetHint: string;
+    annualSavingsHint: string;
+    switchStatus: string;
+    quest: string;
+  } | null;
+  gamification: {
+    currentStreakWeeks: number;
+    longestStreakWeeks: number;
+    streakFreezeCount: number;
+    totalXp: number;
+    currentLevel: number;
+    completedSnacks: unknown;
+    badges: string[];
+    flame: string;
+  } | null;
+  weeklyWrapped: {
+    weekNumber: number;
+    year: number;
+    savingsTotal: string;
+    feesAvoided: string;
+    xpEarned: number;
+    story: unknown;
+  } | null;
+  snacks: Array<{
+    slug: string;
+    category: string;
+    title: string;
+    xpReward: number;
+    content: unknown;
+    quiz: unknown;
+    completed: boolean;
+  }>;
+  voiceHints: string[];
+};
+
+export async function fetchDemoSnapshot(
+  userId: string,
+): Promise<{ ok: true; data: DemoSnapshot } | { ok: false; detail: string }> {
+  return safeJson<DemoSnapshot>(
+    `/v1/demo/snapshot?userId=${encodeURIComponent(userId)}`,
+  );
+}
+
+export async function postDemoCheckIn(
+  userId: string,
+  snackSlug?: string,
+): Promise<
+  | {
+      ok: true;
+      data: {
+        xpGain: number;
+        totalXp: number;
+        currentLevel: number;
+        currentStreakWeeks: number;
+      };
+    }
+  | { ok: false; detail: string }
+> {
+  return safeJson("/v1/demo/check-in", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, snackSlug }),
+  });
+}
+
 /** Voice: search uploaded policy vault via retrieval */
 export async function searchDocumentsVoice(
   userId: string,

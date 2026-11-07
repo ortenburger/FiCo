@@ -7,6 +7,7 @@ import {
   useConversationStatus,
   type MessagePayload,
 } from "@elevenlabs/react";
+import { DemoPanel } from "./demo/DemoPanel";
 import { DropVault } from "./vault/DropVault";
 import {
   VoiceClientTools,
@@ -515,64 +516,52 @@ function Workspace({
           </div>
         </section>
 
-        <aside className="panel side-panel">
-          <h2>Erfasstes Profil</h2>
-          <ul className="profile-summary">
-            <li>
-              <strong>Gehalt</strong>
-              {profile.salary ? (
-                <span>{profile.salary} € brutto/Monat</span>
-              ) : (
-                <span className="is-empty">noch nicht erfasst</span>
-              )}
-            </li>
-            <li>
-              <strong>Familienstand</strong>
-              {profile.marital_status ? (
-                <span>{profile.marital_status}</span>
-              ) : (
-                <span className="is-empty">noch nicht erfasst</span>
-              )}
-            </li>
-          </ul>
-          <small className="profile-hint">
-            Voice-Tools: <code>set_profile_field</code>, <code>ask_copilot</code>,{" "}
-            <code>evaluate_waterfall</code>, <code>list_net_tariffs</code>,{" "}
-            <code>compare_net_tariff</code>, <code>evaluate_policy_gate</code>,{" "}
-            <code>search_documents</code>.
-          </small>
+        <aside className="side-stack">
+          <DemoPanel userId={userId} />
 
-          <h2>Demo-Flow</h2>
-          <ol className="steps">
-            <li>
-              <strong>Modus</strong> Browser-Demo startet ohne Key; ElevenLabs
-              braucht eine eigene public Agent-ID.
-            </li>
-            <li>
-              <strong>Intake</strong> Profil + Vault; Agent kann Waterfall,
-              Nettotarife (HonorarKonzept/con.fee) und Policy-Gate aufrufen.
-            </li>
-            <li>
-              <strong>Export</strong> Transkript als JSON sichern — Grundlage für
-              den Vertragsvergleich.
-            </li>
-          </ol>
+          <section className="panel side-panel">
+            <h2>Erfasstes Profil</h2>
+            <ul className="profile-summary">
+              <li>
+                <strong>Gehalt</strong>
+                {profile.salary ? (
+                  <span>{profile.salary} € brutto/Monat</span>
+                ) : (
+                  <span className="is-empty">noch nicht erfasst</span>
+                )}
+              </li>
+              <li>
+                <strong>Familienstand</strong>
+                {profile.marital_status ? (
+                  <span>{profile.marital_status}</span>
+                ) : (
+                  <span className="is-empty">noch nicht erfasst</span>
+                )}
+              </li>
+            </ul>
+            <small className="profile-hint">
+              Voice-Tools: <code>set_profile_field</code>, <code>ask_copilot</code>,{" "}
+              <code>evaluate_waterfall</code>, <code>list_net_tariffs</code>,{" "}
+              <code>compare_net_tariff</code>, <code>evaluate_policy_gate</code>,{" "}
+              <code>search_documents</code>.
+            </small>
 
-          <h3>Gut zu wissen</h3>
-          <ul className="notes">
-            <li>
-              Die Browser-Demo nutzt die Web Speech API (Chrome, Edge, Safari).
-              Kein ElevenLabs-Konto und kein API-Key nötig.
-            </li>
-            <li>
-              <code>ELEVENLABS_API_KEY</code> gehört nie ins Frontend. Nur
-              public Agents laufen direkt mit Agent-ID.
-            </li>
-            <li>
-              Private Agents brauchen eine <code>signedUrl</code> von deinem
-              Server — niemals den API-Key bündeln.
-            </li>
-          </ul>
+            <h2>Demo-Flow</h2>
+            <ol className="steps">
+              <li>
+                <strong>Modus</strong> Browser-Demo startet ohne Key; ElevenLabs
+                braucht eine eigene public Agent-ID.
+              </li>
+              <li>
+                <strong>Intake</strong> Profil + Vault; Agent kann Waterfall,
+                Nettotarife und Policy-Gate gegen Lena Demo aufrufen.
+              </li>
+              <li>
+                <strong>Gamification</strong> Streak/XP/Snack + Boss-Fight gegen
+                die Allianz-Brutto-BU.
+              </li>
+            </ol>
+          </section>
         </aside>
       </main>
 

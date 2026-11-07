@@ -98,13 +98,15 @@ model User {
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  consents            BankConsent[]
-  accounts            Account[]
-  policies            InsurancePolicy[]
-  allocationProfile   AllocationProfile?
-  userProfile         UserProfile?
-  journalEntries      JournalEntry[]
-  policySwitchCases   PolicySwitchCase[]
+  consents              BankConsent[]
+  accounts              Account[]
+  policies              InsurancePolicy[]
+  allocationProfile     AllocationProfile?
+  userProfile           UserProfile?
+  journalEntries        JournalEntry[]
+  policySwitchCases     PolicySwitchCase[]
+  gamificationProfile   UserGamificationProfile?
+  weeklySummaries       WeeklySummary[]
 
   @@map("users")
 }
@@ -326,4 +328,54 @@ model AdvisoryFeeInvoice {
 
   @@index([userId])
   @@map("advisory_fee_invoices")
+}
+
+// ─── 5. Gamification (decoupled from ledger) ─────────────────────────────────
+
+model UserGamificationProfile {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String    @unique @map("user_id") @db.Uuid
+  currentStreakWeeks Int       @default(0) @map("current_streak_weeks")
+  longestStreakWeeks Int       @default(0) @map("longest_streak_weeks")
+  lastCheckInDate    DateTime? @map("last_check_in_date") @db.Timestamptz(6)
+  streakFreezeCount  Int       @default(1) @map("streak_freeze_count")
+  totalXp            Int       @default(0) @map("total_xp")
+  currentLevel       Int       @default(1) @map("current_level")
+  completedSnacks    Json      @default("[]") @map("completed_snacks")
+  badges             Json      @default("[]")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_gamification_profiles")
+}
+
+model WeeklySummary {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  weekNumber      Int      @map("week_number")
+  year            Int
+  savingsTotal    Decimal  @map("savings_total") @db.Decimal(12, 2)
+  feesAvoided     Decimal  @map("fees_avoided") @db.Decimal(12, 2)
+  xpEarned        Int      @map("xp_earned")
+  microHabitStory Json     @map("micro_habit_story")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, year, weekNumber])
+  @@map("weekly_summaries")
+}
+
+model FinancialSnack {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug      String   @unique @db.VarChar(100)
+  category  String   @db.VarChar(50)
+  title     String   @db.VarChar(255)
+  content   Json
+  quiz      Json
+  xpReward  Int      @default(25) @map("xp_reward")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("financial_snacks")
 }

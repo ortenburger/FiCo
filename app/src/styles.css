@@ -134,6 +134,13 @@ code {
   align-items: start;
 }
 
+.side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--panel-border);
@@ -604,7 +611,7 @@ code {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .side-panel {
+  .side-stack {
     grid-column: 1 / -1;
   }
 }

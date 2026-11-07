@@ -23,6 +23,7 @@ import {
   type NetTariffProviderId,
 } from "@fico/net-tariffs";
 import { z } from "zod";
+import { registerDemoRoutes } from "./demo.js";
 import { registerDocumentRoutes } from "./documents.js";
 import { registerProfileRoutes } from "./profile.js";
 import { registerRetrievalRoutes } from "./retrieval.js";
@@ -246,6 +247,7 @@ app.post("/v1/net-tariffs/applications/handoff", async (req) => {
 await registerProfileRoutes(app);
 await registerDocumentRoutes(app);
 await registerRetrievalRoutes(app);
+await registerDemoRoutes(app);
 
 // Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback
 // first on macOS, so an IPv4-only listener is not reachable by every client.
