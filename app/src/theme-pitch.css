@@ -66,3 +66,13 @@ h1, h2, h3, .topbar-title-group h1 { letter-spacing: -0.035em; font-weight: 800;
 .brand-logo { color: #14181F; background: linear-gradient(135deg, #12B981, #C8F542); box-shadow: var(--shadow-blue); }
 code { background: rgba(255,255,255,0.08); border-color: var(--panel-border); color: var(--accent-deep); }
 input, select, textarea { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--panel-border); border-radius: 12px; }
+
+/* Robert's FiCo mascot replaces the "FC" text badge (logo: public/fico-mascot.png) */
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  font-size: 0;
+  color: transparent;
+  background: #F6F4EE url("/fico-mascot.png") center / 82% no-repeat;
+  box-shadow: 0 0 24px -4px rgba(200, 245, 66, 0.45);
+}
