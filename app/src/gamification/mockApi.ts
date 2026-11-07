@@ -33,6 +33,7 @@ const API_BASE = (import.meta.env.VITE_API_URL ?? "").trim().replace(/\/$/, "");
 export const GAMIFICATION_ENDPOINTS = {
   profile: (userId: string): string =>
     `${API_BASE}/api/gamification/profile?userId=${encodeURIComponent(userId)}`,
+  snacks: (): string => `${API_BASE}/api/gamification/snacks`,
   checkIn: (): string => `${API_BASE}/api/gamification/check-in`,
   snackAnswer: (): string => `${API_BASE}/api/gamification/snacks/answer`,
   wrapped: (userId: string): string =>
@@ -489,11 +490,17 @@ export async function loadGamificationHub(userId: string): Promise<GamificationH
   // route set (profile/check-in/snack-answer/quest-complete) carries no bulk
   // content GET, so the embedded demo stays the content source until the API
   // contract adds one.
+  const realSnacks = realProfile
+    ? await tryReal<FinancialSnackDto[]>(GAMIFICATION_ENDPOINTS.snacks())
+    : null;
+  const snacks =
+    Array.isArray(realSnacks) && realSnacks.length > 0 ? realSnacks : DEMO_SNACKS;
+
   return {
     dataSource: realProfile ? "api" : "demo",
     profile,
     wrapped,
-    snacks: DEMO_SNACKS,
+    snacks,
     chapters: DEMO_CHAPTERS,
     guild: DEMO_GUILD,
   };

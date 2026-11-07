@@ -41,6 +41,9 @@ importers:
       '@fico/finanzmining':
         specifier: workspace:*
         version: link:../finanzmining
+      '@fico/gamification':
+        specifier: workspace:*
+        version: link:../gamification
       '@fico/ledger':
         specifier: workspace:*
         version: link:../ledger
