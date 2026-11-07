@@ -23,6 +23,7 @@ import {
   type NetTariffProviderId,
 } from "@fico/net-tariffs";
 import { z } from "zod";
+import { registerDocumentReadRoutes } from "./document-read.js";
 import { registerDocumentRoutes } from "./documents.js";
 import { registerProfileRoutes } from "./profile.js";
 import { registerRetrievalRoutes } from "./retrieval.js";
@@ -238,6 +239,7 @@ app.post("/v1/net-tariffs/applications/handoff", async (req) => {
 
 await registerProfileRoutes(app);
 await registerDocumentRoutes(app);
+await registerDocumentReadRoutes(app);
 await registerRetrievalRoutes(app);
 
 // Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback

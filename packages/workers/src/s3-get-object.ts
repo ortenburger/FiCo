@@ -21,7 +21,7 @@ function signingKey(
 }
 
 /** Path-style GET for MinIO / S3-compatible stores (see .env.example). */
-export async function fetchS3ObjectUtf8(key: string): Promise<string> {
+export async function fetchS3Object(key: string): Promise<Buffer> {
   const endpoint = (process.env.S3_ENDPOINT ?? "http://localhost:9000").replace(
     /\/$/,
     "",
@@ -94,5 +94,5 @@ export async function fetchS3ObjectUtf8(key: string): Promise<string> {
   }
 
   const buf = Buffer.from(await res.arrayBuffer());
-  return buf.toString("utf8");
+  return buf;
 }

@@ -1,5 +1,13 @@
-/** Embedding dimension — must match packages/db/sql/user_chunks.sql */
-export const EMBEDDING_DIMENSION = 1536;
+import { createLlmProvider, LlmError, type LlmProvider } from "@fico/llm";
+
+/**
+ * Embedding dimension — must match the column width in
+ * packages/db/sql/user_chunks.sql.
+ *
+ * Google AI (text-embedding-004) produces 768 dimensions,
+ * OpenAI (text-embedding-3-small) produces 1536.
+ */
+export const EMBEDDING_DIMENSION = Number(process.env.EMBEDDING_DIMENSION ?? "") || 768;
 
 export type EmbedOutcome =
   | { ok: true; vector: number[] }
@@ -9,66 +17,88 @@ export type EmbedOutcome =
       detail?: string;
     };
 
-function embeddingApiKey(): string | undefined {
-  const key = process.env.OPENAI_API_KEY ?? process.env.EMBEDDING_API_KEY;
-  return key?.trim() || undefined;
+let cachedProvider: LlmProvider | null = null;
+
+function provider(): LlmProvider | null {
+  if (cachedProvider) return cachedProvider;
+  try {
+    cachedProvider = createLlmProvider(process.env).provider;
+    return cachedProvider;
+  } catch {
+    // No credentials configured yet — the caller turns this into a skip.
+    return null;
+  }
 }
 
 /**
- * Returns a dense embedding vector, or a skip signal when no provider key is configured.
+ * Returns a dense embedding vector, or a skip signal when no provider key is
+ * configured.
  */
 export async function embed(text: string): Promise<EmbedOutcome> {
-  const trimmed = text.trim();
-  if (!trimmed) {
+  return embedBatch([text]).then((outcome) =>
+    outcome.ok
+      ? { ok: true, vector: outcome.vectors[0]! }
+      : { ok: false, reason: outcome.reason, detail: outcome.detail },
+  );
+}
+
+export type EmbedBatchOutcome =
+  | { ok: true; vectors: number[][] }
+  | {
+      ok: false;
+      reason: "missing_api_key" | "api_error" | "empty_embedding";
+      detail?: string;
+    };
+
+/**
+ * Embeds several texts in one provider request. The ingestion loop embeds
+ * every chunk of a document, so batching removes one round trip per chunk.
+ */
+export async function embedBatch(texts: string[]): Promise<EmbedBatchOutcome> {
+  const usable = texts.map((text) => text.trim()).filter((text) => text.length > 0);
+  if (usable.length === 0) {
     return { ok: false, reason: "empty_embedding" };
   }
 
-  const apiKey = embeddingApiKey();
-  if (!apiKey) {
+  const llm = provider();
+  if (!llm) {
     console.warn(
-      "[embed] OPENAI_API_KEY / EMBEDDING_API_KEY unset — chunk skipped (empty embedding marker)",
+      "[embed] no LLM provider configured (GEMINI_API_KEY / OPENAI_API_KEY) — chunk skipped",
     );
     return { ok: false, reason: "missing_api_key" };
   }
 
-  const model =
-    process.env.EMBEDDING_MODEL?.trim() || "text-embedding-3-small";
-  const baseUrl =
-    process.env.EMBEDDING_BASE_URL?.replace(/\/$/, "") ||
-    "https://api.openai.com/v1";
+  try {
+    const response = await llm.embed({ texts: usable, kind: "document" });
+    const vectors = response.vectors;
 
-  const res = await fetch(`${baseUrl}/embeddings`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ model, input: trimmed }),
-  });
+    if (!vectors.length) {
+      return { ok: false, reason: "empty_embedding" };
+    }
 
-  if (!res.ok) {
-    const detail = await res.text().catch(() => res.statusText);
-    console.warn("[embed] provider error:", res.status, detail.slice(0, 200));
-    return { ok: false, reason: "api_error", detail };
-  }
-
-  const payload = (await res.json()) as {
-    data?: Array<{ embedding?: number[] }>;
-  };
-  const vector = payload.data?.[0]?.embedding;
-  if (!vector?.length) {
-    console.warn("[embed] provider returned empty embedding — chunk skipped");
-    return { ok: false, reason: "empty_embedding" };
-  }
-
-  if (vector.length !== EMBEDDING_DIMENSION) {
-    console.warn(
-      `[embed] dimension mismatch: got ${vector.length}, expected ${EMBEDDING_DIMENSION} — chunk skipped`,
+    const wrongDimension = vectors.find(
+      (vector) => vector.length !== EMBEDDING_DIMENSION,
     );
-    return { ok: false, reason: "empty_embedding" };
-  }
+    if (wrongDimension) {
+      console.warn(
+        `[embed] dimension mismatch: got ${wrongDimension.length}, expected ${EMBEDDING_DIMENSION} — chunks skipped`,
+      );
+      return {
+        ok: false,
+        reason: "empty_embedding",
+        detail: `dimension ${wrongDimension.length} != ${EMBEDDING_DIMENSION}`,
+      };
+    }
 
-  return { ok: true, vector };
+    return { ok: true, vectors };
+  } catch (caught) {
+    if (caught instanceof LlmError) {
+      console.warn("[embed] provider error:", caught.reason, caught.message);
+      return { ok: false, reason: "api_error", detail: caught.message };
+    }
+    console.warn("[embed] unexpected error:", caught);
+    return { ok: false, reason: "api_error" };
+  }
 }
 
 export function vectorLiteral(values: number[]): string {
