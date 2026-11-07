@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "fico": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/ABS/PATH/TO/FiCo/mcp",
+        "fico-mcp"
+      ],
+      "env": {
+        "FICO_API_BASE": "http://127.0.0.1:3001",
+        "FICO_DEMO_USER_ID": "00000000-0000-4000-8000-000000000001"
+      }
+    }
+  }
+}

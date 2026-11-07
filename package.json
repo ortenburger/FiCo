@@ -12,8 +12,10 @@
     "db:migrate": "pnpm --filter @fico/db migrate:dev",
     "db:push": "pnpm --filter @fico/db push",
     "dev:api": "pnpm --filter @fico/api dev",
-    "dev:workers": "pnpm --filter @fico/workers dev"
+    "dev:workers": "pnpm --filter @fico/workers dev",
+    "dev:mcp": "uv run --directory mcp fico-mcp"
   },
+
   "engines": {
     "node": ">=20"
   }

@@ -12,6 +12,10 @@ packages/db/prisma/*.db-journal
 .idea/
 .vscode/
 graphify-out/
+mcp/.venv/
+mcp/**/__pycache__/
+mcp/**/*.egg-info/
+.uv/
 
 # pitch motion: keep the encoded video + poster, drop the frame dumps
 pitch/out/frames/
