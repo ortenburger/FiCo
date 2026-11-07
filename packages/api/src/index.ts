@@ -24,6 +24,7 @@ import {
 } from "@fico/net-tariffs";
 import { z } from "zod";
 import { registerDocumentReadRoutes } from "./document-read.js";
+import { registerDemoRoutes } from "./demo.js";
 import { registerDocumentRoutes } from "./documents.js";
 import { registerProfileRoutes } from "./profile.js";
 import { registerRetrievalRoutes } from "./retrieval.js";
@@ -42,7 +43,14 @@ await app.register(cors, {
 app.get("/health", async () => ({
   status: "ok",
   service: "fico-api",
-  contexts: ["A:OpenFinance", "B:Ledger", "C:Policy"],
+  contexts: [
+    "A:OpenFinance",
+    "B:Ledger",
+    "C:Policy",
+    "Voice",
+    "NetTariffs",
+    "Finanzmining",
+  ],
 }));
 
 /**
@@ -241,6 +249,7 @@ await registerProfileRoutes(app);
 await registerDocumentRoutes(app);
 await registerDocumentReadRoutes(app);
 await registerRetrievalRoutes(app);
+await registerDemoRoutes(app);
 
 // Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback
 // first on macOS, so an IPv4-only listener is not reachable by every client.

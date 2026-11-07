@@ -7,6 +7,7 @@ import {
   useConversationStatus,
   type MessagePayload,
 } from "@elevenlabs/react";
+import { DemoPanel } from "./demo/DemoPanel";
 import { DropVault } from "./vault/DropVault";
 import { GamificationHub } from "./gamification";
 import {
@@ -508,6 +509,8 @@ function Workspace({
               TAB 4: VOICE COPILOT, VAULT & WPIG FIREWALL
               ================================================================ */}
           {activeTab === "copilot" && (
+            <>
+            <DemoPanel userId={userId} />
             <div className="layout">
               <section className="panel call-panel">
                 <div className="panel-head">
@@ -773,6 +776,7 @@ function Workspace({
                 </small>
               </aside>
             </div>
+            </>
           )}
 
           <footer className="footer">
