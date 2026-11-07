@@ -207,7 +207,7 @@ export function GamificationHub({
       label: "Emergency Shield",
       value: wrapped.emergencyShield.percent,
       max: 100,
-      color: "#2563eb",
+      color: "#C8F542",
       gradientColor: "#60a5fa",
     },
     {
@@ -349,7 +349,7 @@ export function GamificationHub({
         <div className="wrapped-grid">
           <div className="wrapped-tile wrapped-tile--highlight">
             <span className="wrapped-tile-label">💰 Cashflow Pulse</span>
-            <div className="wrapped-tile-value" style={{ color: "#1d4ed8" }}>
+            <div className="wrapped-tile-value" style={{ color: "#C8F542" }}>
               {euroFmt.format(wrapped.cashflowPulse.freeSurplus)} Surplus
             </div>
             <div className="wrapped-tile-sub">
@@ -433,7 +433,7 @@ export function GamificationHub({
                             <span
                               style={{
                                 fontSize: "0.74rem",
-                                color: "#2563eb",
+                                color: "#C8F542",
                                 fontWeight: 700,
                               }}
                             >
@@ -527,7 +527,7 @@ export function GamificationHub({
                 style={{
                   display: "block",
                   fontSize: "0.85rem",
-                  color: "#1e3a8a",
+                  color: "#C8F542",
                   marginBottom: "8px",
                 }}
               >

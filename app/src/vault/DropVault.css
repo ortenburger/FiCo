@@ -26,7 +26,7 @@
   text-align: center;
   cursor: pointer;
   background: rgba(255,255,255,0.055);
-  color: #9bbcff;
+  color: #C8F542;
   font-size: 0.86rem;
   font-weight: 600;
   transition:
@@ -36,14 +36,14 @@
 }
 
 .drop-vault__zone:hover {
-  border-color: #2563eb;
-  background: rgba(37,99,235,0.16);
+  border-color: #12B981;
+  background: rgba(18,185,129,0.16);
 }
 
 .drop-vault__zone--active {
-  border-color: #1d4ed8;
-  background: rgba(37,99,235,0.22);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  border-color: #0B674D;
+  background: rgba(18,185,129,0.22);
+  box-shadow: 0 0 0 4px rgba(18,185,129, 0.12);
 }
 
 .drop-vault__zone--busy {

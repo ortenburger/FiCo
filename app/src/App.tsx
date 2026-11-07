@@ -433,7 +433,7 @@ function Workspace({
               </li>
               <li>
                 <strong>Tarif-Typ</strong>
-                <span style={{ color: "#2563eb" }}>Nettotarif (§ 48b VAG)</span>
+                <span style={{ color: "#C8F542" }}>Nettotarif (§ 48b VAG)</span>
               </li>
             </ul>
           </div>
