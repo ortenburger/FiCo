@@ -1,19 +1,20 @@
-# FiCo — Financial Copilot & Net-Tariff Orchestration Engine 🚀
+<div align="center">
+  <img src="FiCo_Logo.png" alt="FiCo Logo" width="220" />
+  <h1>FiCo</h1>
+  <p><strong>Autonomous Financial Ledger & Net-Tariff Orchestration Engine (FL-NTOE)</strong></p>
+  <p><em>Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.</em></p>
+  <p><strong>Built for Founders Hackathon Stuttgart — November 7, 2026</strong></p>
+</div>
 
 <p align="center">
-  <img src="./FiCo_Logo.png" alt="FiCo Logo" width="160" />
+  <a href="https://github.com"><img src="https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square" alt="Hackathon" /></a>
+  <a href="./technical_overview.md"><img src="https://img.shields.io/badge/Architecture-Technical%20Overview-blueviolet?style=flat-square" alt="Architecture" /></a>
+  <a href="./GAMIFICATION.md"><img src="https://img.shields.io/badge/Gamification-Duolingo%20Style%20%7C%20Weekly%20Streaks-FF9F43?style=flat-square" alt="Gamification" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square" alt="TypeScript" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square" alt="Node" /></a>
+  <a href="https://vitest.dev/"><img src="https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen?style=flat-square" alt="Tests" /></a>
+  <a href="https://www.bafin.de"><img src="https://img.shields.io/badge/Compliance-PSD2%2FPSD3%20%7C%20WpIG%20%7C%20VAG-orange?style=flat-square" alt="Compliance" /></a>
 </p>
-
-> **Built for Founders Hackathon Stuttgart — November 7, 2026**  
-> *Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2027 Altersvorsorgedepot reform.*
-
-[![Founders Hackathon 2026](https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square)](https://github.com)
-[![Architecture](https://img.shields.io/badge/Architecture-Technical%20Overview-blueviolet?style=flat-square)](./technical_overview.md)
-[![Gamification](https://img.shields.io/badge/Gamification-Duolingo%20Style%20%7C%20Weekly%20Streaks-FF9F43?style=flat-square)](./GAMIFICATION.md)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square)](https://nodejs.org/)
-[![Vitest](https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen?style=flat-square)](https://vitest.dev/)
-[![Compliance](https://img.shields.io/badge/Compliance-PSD2%2FPSD3%20%7C%20WpIG%20%7C%20VAG-orange?style=flat-square)](https://www.bafin.de)
 
 ---
 

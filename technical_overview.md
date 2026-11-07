@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="FiCo_Logo.png" alt="FiCo Logo" width="140" />
+</p>
+
 # FiCo — Complete Technical Architecture & System Overview 🛠️
 
 > **Autonomous Financial Ledger & Net-Tariff Orchestration Engine (FL-NTOE)**  

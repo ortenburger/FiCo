@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="FiCo_Logo.png" alt="FiCo Logo" width="140" />
+</p>
+
 # FiCo Gamification Architecture: Duolingo for Financial Sovereignty 🎮
 
 > *"Making personal finance as engaging as learning a language on Duolingo, turning abstract 40-year compound interest into tangible, weekly micro-wins and bite-sized learnings."*
