@@ -348,3 +348,398 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ==========================================================================
+   Feature 1 — Altersvorsorgedepot Shock Slider
+   ========================================================================== */
+
+.shock-card,
+.boss-card,
+.guild-card {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 14px 32px -16px rgba(0, 0, 0, 0.55);
+}
+
+.shock-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 18px 0 20px;
+}
+
+.shock-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shock-slider-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.shock-slider-label strong {
+  font-size: 1.05rem;
+  color: #C8F542;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shock-slider input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #334155, #12B981);
+  outline: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+}
+
+.shock-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #C8F542;
+  border: 2px solid #0f172a;
+  box-shadow: 0 0 0 4px rgba(200, 245, 66, 0.25);
+  cursor: grab;
+}
+
+.shock-slider input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #C8F542;
+  border: 2px solid #0f172a;
+  box-shadow: 0 0 0 4px rgba(200, 245, 66, 0.25);
+  cursor: grab;
+}
+
+.shock-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shock-bar-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.9fr) minmax(0, 2fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.shock-bar-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.shock-bar-track {
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #334155;
+  overflow: hidden;
+}
+
+.shock-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 280ms ease;
+}
+
+.shock-bar-fill--legacy {
+  background: linear-gradient(90deg, #fb7185, #e11d48);
+}
+
+.shock-bar-fill--depot {
+  background: linear-gradient(90deg, #12B981, #C8F542);
+}
+
+.shock-bar-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fb7185;
+  min-width: 6.5rem;
+  text-align: right;
+}
+
+.shock-bar-value--depot {
+  color: #C8F542;
+}
+
+.shock-banner {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #14181F;
+  background: linear-gradient(135deg, #C8F542 0%, #fde68a 100%);
+  border: 1px solid rgba(200, 245, 66, 0.55);
+  box-shadow: 0 0 28px -8px rgba(200, 245, 66, 0.55);
+}
+
+/* ==========================================================================
+   Feature 2 — Boss Battle HP Card
+   ========================================================================== */
+
+.boss-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(251, 113, 133, 0.35);
+}
+
+.boss-card.is-defeated {
+  border-color: rgba(200, 245, 66, 0.45);
+}
+
+.boss-card.is-shaking {
+  animation: boss-shake 0.55s ease-in-out;
+}
+
+@keyframes boss-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-10px) rotate(-0.6deg);
+  }
+  30% {
+    transform: translateX(10px) rotate(0.6deg);
+  }
+  45% {
+    transform: translateX(-8px);
+  }
+  60% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+.boss-arena {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin: 16px 0 18px;
+  position: relative;
+}
+
+.boss-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  background: rgba(251, 113, 133, 0.12);
+  border: 1px solid rgba(251, 113, 133, 0.35);
+}
+
+.boss-vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.boss-hp-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 650;
+}
+
+.boss-hp-meta strong {
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.boss-hp-track {
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #334155;
+  overflow: hidden;
+}
+
+.boss-hp-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ef4444, #fb7185);
+  transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1), background 400ms ease;
+}
+
+.boss-hp-fill.is-critical {
+  background: linear-gradient(90deg, #f59e0b, #C8F542);
+}
+
+.boss-hp-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.4;
+}
+
+.boss-float-text {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 850;
+  color: #14181F;
+  background: #C8F542;
+  box-shadow: 0 10px 30px -10px rgba(200, 245, 66, 0.7);
+  animation: boss-float 1.5s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes boss-float {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-18px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-36px);
+  }
+}
+
+.boss-strike-btn {
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  color: #14181F;
+  background: linear-gradient(135deg, #fb7185, #C8F542);
+  box-shadow: 0 10px 28px -12px rgba(251, 113, 133, 0.65);
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+.boss-strike-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.boss-strike-btn:disabled {
+  cursor: default;
+  opacity: 0.85;
+  background: linear-gradient(135deg, #12B981, #C8F542);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Feature 3 — Cooperative Guild Card
+   ========================================================================== */
+
+.guild-card {
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.guild-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 14px;
+}
+
+.guild-metric {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guild-metric span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.guild-metric strong {
+  font-size: 1.15rem;
+  font-weight: 850;
+  color: #60a5fa;
+}
+
+.guild-perk {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 750;
+  color: #C8F542;
+  background: rgba(200, 245, 66, 0.1);
+  border: 1px solid rgba(200, 245, 66, 0.28);
+}
+
+.guild-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.guild-invite-toast {
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: #60a5fa;
+}
+
+@media (max-width: 900px) {
+  .shock-controls,
+  .guild-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shock-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .shock-bar-value {
+    text-align: left;
+  }
+}
