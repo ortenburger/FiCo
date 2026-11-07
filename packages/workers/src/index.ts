@@ -6,6 +6,7 @@ import {
   FinexpertClient,
   maxDocumentConcurrency,
 } from "@fico/policy";
+import { ingestDocumentChunks } from "./ingest-document-chunks.js";
 
 /**
  * Background workers — ALL external HTTP lives here.
@@ -66,7 +67,19 @@ new Worker(
       });
     }
 
-    return { gate, heuristic };
+    let ragIngest:
+      | Awaited<ReturnType<typeof ingestDocumentChunks>>
+      | undefined;
+    if (gate.triggerStatus !== "REJECTED") {
+      ragIngest = await ingestDocumentChunks({
+        userId: String(job.data.userId ?? ""),
+        policyId: String(job.data.policyId ?? ""),
+        rawDocumentS3Key: String(job.data.rawDocumentS3Key ?? ""),
+        fallbackText: textSample,
+      });
+    }
+
+    return { gate, heuristic, ragIngest };
   },
   { connection, concurrency: docConcurrency },
 );
