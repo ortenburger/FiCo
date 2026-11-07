@@ -240,4 +240,6 @@ await registerProfileRoutes(app);
 await registerDocumentRoutes(app);
 await registerRetrievalRoutes(app);
 
+// Listen on both loopback stacks. "localhost" resolves to the IPv6 loopback
+// first on macOS, so an IPv4-only listener is not reachable by every client.
 await app.listen({ port, host: "0.0.0.0" });
