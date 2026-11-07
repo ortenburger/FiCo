@@ -5,7 +5,7 @@
 </p>
 
 > **Built for Founders Hackathon Stuttgart — November 7, 2026**  
-> *Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2026 Altersvorsorgedepot reform.*
+> *Transforming the dry, bureaucratic world of finance and insurance into an engaging, gamified journey for Gen Z and Millennials — powered by Germany's 2027 Altersvorsorgedepot reform.*
 
 [![Founders Hackathon 2026](https://img.shields.io/badge/Hackathon-Founders%20Hackathon%20Stuttgart%202026-6C5CE7?style=flat-square)](https://github.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Technical%20Overview-blueviolet?style=flat-square)](./technical_overview.md)
