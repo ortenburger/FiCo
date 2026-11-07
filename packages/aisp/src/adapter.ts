@@ -45,7 +45,7 @@ export interface AispConnector {
  * publish raw JSON to Redis Streams — never call HTTP inside @Transactional.
  */
 export class StubAispConnector implements AispConnector {
-  readonly name: AispAdapterName = "FINAPI";
+  constructor(readonly name: AispAdapterName = "FINAPI") {}
 
   async fetchTransactions(): Promise<AispTransactionPage> {
     return { items: [] };

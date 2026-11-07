@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fico/aisp": "workspace:*",
+    "@fico/datasources": "workspace:*",
     "@fico/db": "workspace:*",
     "@fico/ledger": "workspace:*",
     "@fico/policy": "workspace:*",

@@ -151,14 +151,30 @@ Unlike generic AI wrappers, FiCo enforces hard regulatory invariants at the core
 
 ```
 packages/
-├── aisp/         # PSD2/PSD3 AISP adapter, HMAC webhooks, recurring transaction classifier
+├── aisp/         # finAPI + Tink + wealthAPI AISP connectors (read-only), HMAC, classifier
+├── datasources/  # Canonical registry: Open Finance + all finexpert.de/schnittstellen
 ├── api/          # High-performance Fastify edge API (synchronous, lightweight)
 ├── db/           # Prisma schema & PostgreSQL migrations (double-entry ledger models)
 ├── ledger/       # Append-only double-entry OCC engine + deterministic cash waterfall
-├── policy/       # Local OCR heuristics, economic circuit breakers, net-policy evaluation
+├── policy/       # OCR heuristics, economic gate, finexpert Schnittstellen clients
 ├── regulatory/   # WpIG investment firewall, VAG commission invariants, VVG state machine
 └── workers/      # BullMQ background workers for async document & upstream operations
 ```
+
+### Datasources
+
+| ID | Source | Role |
+| --- | --- | --- |
+| `FINAPI` / `TINK` | Open Finance AISP | Bank accounts & transactions (no PISP) |
+| `WEALTHAPI` | Wealth | Depot snapshots |
+| `FINEXPERT_REST` | [finexpert Schnittstellen](https://www.finexpert.de/schnittstellen/) | REST API (kunden, risikocheck) |
+| `BLAU_DIREKT` | finexpert | Native pool two-way sync / Abschlussstrecke |
+| `BCA` | finexpert | BCA Bestand / CRM / Dokumente |
+| `FRANKE_BORNBERG` | finexpert | fb>vertragscheck synopsis |
+| `TAA` | finexpert | Tarifrechner → Beratungskonzept |
+| `MVP` | finexpert | Maklerverwaltungsprogramm sync |
+
+`GET /v1/datasources` returns runtime config status for all nine.
 
 ---
 

@@ -29,6 +29,9 @@ importers:
       '@fico/aisp':
         specifier: workspace:*
         version: link:../aisp
+      '@fico/datasources':
+        specifier: workspace:*
+        version: link:../datasources
       '@fico/db':
         specifier: workspace:*
         version: link:../db
@@ -54,6 +57,15 @@ importers:
       tsx:
         specifier: ^4.19.3
         version: 4.23.15
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(tsx@4.23.15)
+
+  packages/datasources:
+    devDependencies:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
@@ -131,9 +143,6 @@ importers:
       bullmq:
         specifier: ^5.41.0
         version: 5.81.5
-      ioredis:
-        specifier: ^5.5.0
-        version: 5.11.1
     devDependencies:
       '@types/node':
         specifier: ^22.20.5

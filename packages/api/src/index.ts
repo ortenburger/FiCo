@@ -3,6 +3,13 @@ import { evaluateInvestmentQuery } from "@fico/regulatory";
 import { evaluateWaterfall } from "@fico/ledger";
 import { evaluateEconomicGate, type PolicyType } from "@fico/policy";
 import { evaluateScaHealth } from "@fico/aisp";
+import {
+  FINEXPERT_SCHNITTSTELLEN,
+  OPEN_FINANCE_DATASOURCES,
+  describeDatasourceRegistry,
+  getDatasource,
+  isKnownDatasource,
+} from "@fico/datasources";
 import { z } from "zod";
 
 const port = Number(process.env.API_PORT ?? 3000);
@@ -73,6 +80,22 @@ app.get("/v1/aisp/sca-health", async (req) => {
     scaValidUntil: new Date(q.scaValidUntil),
     lastBookingDate: q.lastBookingDate ? new Date(q.lastBookingDate) : null,
   });
+});
+
+/** All registered datasources: finAPI, Tink, wealthAPI + finexpert Schnittstellen */
+app.get("/v1/datasources", async () => ({
+  openFinance: OPEN_FINANCE_DATASOURCES,
+  finexpertSchnittstellen: FINEXPERT_SCHNITTSTELLEN,
+  catalogUrl: "https://www.finexpert.de/schnittstellen/",
+  items: describeDatasourceRegistry(),
+}));
+
+app.get("/v1/datasources/:id", async (req, reply) => {
+  const { id } = z.object({ id: z.string() }).parse(req.params);
+  if (!isKnownDatasource(id)) {
+    return reply.code(404).send({ error: "Unknown datasource", id });
+  }
+  return getDatasource(id);
 });
 
 await app.listen({ port, host: "0.0.0.0" });
