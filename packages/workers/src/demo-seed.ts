@@ -232,8 +232,8 @@ export interface DemoSeedClient {
   userGamificationProfile: {
     upsert(args: {
       where: { userId: string };
-      create: { userId: string } & DemoUserProfile;
-      update: DemoUserProfile;
+      create: DemoUserProfile;
+      update: Omit<DemoUserProfile, "userId">;
     }): Promise<unknown>;
   };
   financialSnack: {

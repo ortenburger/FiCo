@@ -15,6 +15,7 @@ import {
   levelTitleFor,
   loadGamificationHub,
   submitCheckIn,
+  submitQuestComplete,
   submitSnackAnswer,
   xpFloors,
 } from "./mockApi";
@@ -163,10 +164,16 @@ export function GamificationHub({
     });
   };
 
-  const handleCompleteQuest = (chapterIdx: number, questId: string) => {
+  const handleCompleteQuest = async (chapterIdx: number, questId: string) => {
     const chapter = chapters[chapterIdx];
     const quest = chapter?.quests.find((q) => q.id === questId);
     if (!quest || quest.completed) return;
+
+    const res = await submitQuestComplete({
+      userId,
+      questId: quest.id,
+      xp: quest.xp,
+    });
 
     setChapters((prev) =>
       prev.map((ch, idx) =>
@@ -180,12 +187,12 @@ export function GamificationHub({
             },
       ),
     );
-    applyXpDelta(quest.xp);
+    applyXpDelta(res.xpGained);
     setToast({
       title: `🏆 Quest abgeschlossen: ${quest.title}`,
-      description: `Skill-Tree Fortschritt freigeschaltet (+${quest.xp} XP)`,
+      description: `Skill-Tree Fortschritt freigeschaltet (+${res.xpGained} XP)`,
       type: "level",
-      reward: { xp: quest.xp },
+      reward: { xp: res.xpGained },
       showConfetti: true,
     });
   };

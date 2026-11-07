@@ -20,8 +20,8 @@ const defaultApiBase =
   typeof import.meta !== "undefined" &&
   import.meta.env &&
   typeof import.meta.env.VITE_API_BASE_URL === "string"
-    ? import.meta.env.VITE_API_BASE_URL
-    : "http://localhost:3000";
+    ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "")
+    : "";
 
 export function DropVault({ userId, apiBaseUrl = defaultApiBase }: DropVaultProps) {
   const [phase, setPhase] = useState<UploadPhase>("idle");

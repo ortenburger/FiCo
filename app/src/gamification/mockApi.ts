@@ -36,6 +36,7 @@ export const GAMIFICATION_ENDPOINTS = {
   snacks: (): string => `${API_BASE}/api/gamification/snacks`,
   checkIn: (): string => `${API_BASE}/api/gamification/check-in`,
   snackAnswer: (): string => `${API_BASE}/api/gamification/snacks/answer`,
+  questComplete: (): string => `${API_BASE}/api/gamification/quests/complete`,
   wrapped: (userId: string): string =>
     `${API_BASE}/api/gamification/wrapped/latest?userId=${encodeURIComponent(userId)}`,
 } as const;
@@ -543,6 +544,22 @@ export async function submitSnackAnswer(input: {
     xpGained: correct ? snack.xpReward : -snack.wrongXpPenalty,
     correctOptionId: correctOption?.id ?? null,
   };
+}
+
+export async function submitQuestComplete(input: {
+  userId: string;
+  questId: string;
+  xp: number;
+}): Promise<{ xpGained: number }> {
+  const real = await tryReal<{ xpGained: number }>(
+    GAMIFICATION_ENDPOINTS.questComplete(),
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  if (real && typeof real.xpGained === "number") return real;
+  return { xpGained: input.xp };
 }
 
 export const DEMO_CONTENT = {

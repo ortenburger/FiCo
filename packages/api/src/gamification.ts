@@ -78,6 +78,61 @@ export function registerGamificationRoutes(app: FastifyInstance) {
     DEFAULT_SNACKS.map((snack, index) => toSnackDto(snack, index)),
   );
 
+  app.get("/api/gamification/wrapped/latest", async (req, reply) => {
+    const parsed = userIdQuery.safeParse(req.query);
+    if (!parsed.success) return reply.code(400).send({ error: "userId (uuid) required" });
+    try {
+      const latest = await prisma.weeklySummary.findFirst({
+        where: { userId: parsed.data.userId },
+        orderBy: [{ year: "desc" }, { weekNumber: "desc" }],
+      });
+      if (!latest) return reply.code(404).send({ error: "No weekly summary yet" });
+      const story =
+        typeof latest.microHabitStory === "object" && latest.microHabitStory !== null
+          ? (latest.microHabitStory as Record<string, unknown>)
+          : {};
+      return {
+        weekNumber: latest.weekNumber,
+        year: latest.year,
+        xpEarned: latest.xpEarned,
+        ...story,
+      };
+    } catch (error) {
+      req.log.warn({ err: error }, "gamification wrapped failed");
+      return reply.code(404).send({ error: "Wrapped unavailable" });
+    }
+  });
+
+  app.post("/api/gamification/quests/complete", async (req, reply) => {
+    const parsed = z
+      .object({
+        userId: z.string().uuid(),
+        questId: z.string().min(1),
+        xp: z.number().int().positive().default(100),
+      })
+      .safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: "Invalid quest payload" });
+    const { userId, questId, xp } = parsed.data;
+    try {
+      await loadOrCreate(userId);
+      const award = await engine.emit(userId, {
+        type: "QUEST_COMPLETED",
+        eventId: `quest:${userId}:${questId}`,
+        meta: { xp, questId },
+      });
+      const updated = await engine.getProfile(userId);
+      return {
+        xpGained: award.xpGained,
+        levelUp: award.levelUp,
+        badgesEarned: award.badgesEarned,
+        profile: updated,
+      };
+    } catch (error) {
+      req.log.warn({ err: error }, "gamification quest complete failed");
+      return reply.code(404).send({ error: "Quest completion failed" });
+    }
+  });
+
   app.post("/api/gamification/check-in", async (req, reply) => {
     const parsed = userIdQuery.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: "userId (uuid) required" });
@@ -114,7 +169,7 @@ export function registerGamificationRoutes(app: FastifyInstance) {
       .object({
         userId: z.string().uuid(),
         snackSlug: z.string().min(1),
-        optionId: z.string().regex(/^opt-\d+$/),
+        optionId: z.string().min(1),
       })
       .safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: "Invalid answer payload" });
@@ -123,7 +178,13 @@ export function registerGamificationRoutes(app: FastifyInstance) {
     const snack = DEFAULT_SNACKS.find((candidate) => candidate.slug === snackSlug);
     if (!snack) return reply.code(404).send({ error: "Unknown snack" });
 
-    const answerIndex = Number(optionId.slice(4));
+    const letterMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
+    const answerIndex = optionId.startsWith("opt-")
+      ? Number(optionId.slice(4))
+      : (letterMap[optionId.toLowerCase()] ?? -1);
+    if (!Number.isInteger(answerIndex) || answerIndex < 0) {
+      return reply.code(400).send({ error: "Invalid optionId" });
+    }
     const evaluation = evaluateQuizAnswer(snack, answerIndex);
     const correctIndex = snack.quiz.options.findIndex((option) => option.isCorrect);
     const correctOptionId = correctIndex >= 0 ? `opt-${correctIndex}` : null;

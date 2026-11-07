@@ -11,6 +11,11 @@ import { DemoPanel } from "./demo/DemoPanel";
 import { DropVault } from "./vault/DropVault";
 import { GamificationHub } from "./gamification";
 import {
+  CashflowOpenFinanceTab,
+  DocumentExplorerWidget,
+  NetTariffArenaTab,
+} from "./BackendSuites";
+import {
   VoiceClientTools,
   type ProfileUiState,
 } from "./voice/VoiceClientTools";
@@ -23,7 +28,7 @@ type Turn = {
 };
 
 type Mode = "elevenlabs" | "local";
-type NavTab = "gamification" | "copilot";
+type NavTab = "gamification" | "arena" | "waterfall" | "copilot";
 
 type RecognitionResultList = {
   length: number;
@@ -46,9 +51,9 @@ type RecognitionLike = {
 
 const STORAGE_KEY = "fico:agent-id";
 const ENV_AGENT_ID = (import.meta.env.VITE_ELEVENLABS_AGENT_ID ?? "").trim();
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
-).trim();
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "")
+  .trim()
+  .replace(/\/$/, "");
 
 const DEMO_USER_ID = (
   import.meta.env.VITE_DEMO_USER_ID ?? "00000000-0000-4000-8000-000000000001"
@@ -116,6 +121,31 @@ function App() {
 
   const handleProfileField = useCallback((field: ProfileField, value: string) => {
     setProfile((previous) => ({ ...previous, [field]: value }));
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch(
+      `${API_BASE_URL}/v1/profile?userId=${encodeURIComponent(DEMO_USER_ID)}`,
+    )
+      .then((res) => (res.ok ? res.json() : null))
+      .then(
+        (
+          data: {
+            profile?: { salary?: string | null; marital_status?: string | null };
+          } | null,
+        ) => {
+          if (!active || !data?.profile) return;
+          setProfile((prev) => ({
+            salary: data.profile?.salary ?? prev.salary,
+            marital_status: data.profile?.marital_status ?? prev.marital_status,
+          }));
+        },
+      )
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -358,10 +388,20 @@ function Workspace({
       subtitle:
         "Duolingo-inspirierte Finanzbildung: Sunday Money Ritual, Questro Progress Rings, Weekly Money Wrapped & 90-Sekunden-Snacks.",
     },
-    copilot: {
-      title: "Voice Copilot, Policen-Tresor & WpIG-Firewall",
+    arena: {
+      title: "Nettotarif-Arena, Economic Gate & Altersvorsorgedepot-Simulator",
       subtitle:
-        "Sprachgestützter Vertrags-Intake (ElevenLabs / Web Speech), S3-Dokument-Upload & regulatorische BaFin/WpIG-Prüfung.",
+        "§ 48b VAG Nettotarif-Katalog, Live-Vergleichsrechner, Handoff-Orchestrator & Altvertrag-Storno-Gate.",
+    },
+    waterfall: {
+      title: "Cashflow-Waterfall, PSD2 SCA-Health & Knowledge Datasources",
+      subtitle:
+        "Automatische Monatsbudget-Orchestrierung (/v1/ledger/waterfall), 90-Tage-PSD2-Konsens-Ampel & aktive Wissensquellen.",
+    },
+    copilot: {
+      title: "Voice Copilot, Policen-Tresor, RAG-Suche & WpIG-Firewall",
+      subtitle:
+        "Sprachgestützter Vertrags-Intake (ElevenLabs / Web Speech), S3-Dokument-Upload, RAG-Volltextsuche & BaFin/WpIG-Prüfung.",
     },
   };
 
@@ -383,7 +423,6 @@ function Workspace({
           <div>
             <div className="nav-section-label">Plattform-Menü</div>
             <nav className="nav-list" aria-label="Hauptnavigation">
-
               <button
                 type="button"
                 className={`nav-item ${activeTab === "gamification" ? "is-active" : ""}`}
@@ -396,7 +435,29 @@ function Workspace({
                 <span className="nav-badge">🔥 {streakWeeks}W</span>
               </button>
 
+              <button
+                type="button"
+                className={`nav-item ${activeTab === "arena" ? "is-active" : ""}`}
+                onClick={() => setActiveTab("arena")}
+              >
+                <span className="nav-item-left">
+                  <span className="nav-icon">⚖️</span>
+                  <span>Nettotarif-Arena</span>
+                </span>
+                <span className="nav-badge">0 € Prov.</span>
+              </button>
 
+              <button
+                type="button"
+                className={`nav-item ${activeTab === "waterfall" ? "is-active" : ""}`}
+                onClick={() => setActiveTab("waterfall")}
+              >
+                <span className="nav-item-left">
+                  <span className="nav-icon">💧</span>
+                  <span>Cashflow & PSD2</span>
+                </span>
+                <span className="nav-badge">Live</span>
+              </button>
 
               <button
                 type="button"
@@ -494,7 +555,7 @@ function Workspace({
 
         <main className="shell-content">
           {/* ================================================================
-              TAB 1B: GAMIFICATION HUB (QUESTRO + WRAPPED + SKILL TREE + SNACKS)
+              TAB 1: GAMIFICATION HUB (QUESTRO + WRAPPED + SKILL TREE + SNACKS)
               ================================================================ */}
           {activeTab === "gamification" && (
             <GamificationHub
@@ -505,6 +566,17 @@ function Workspace({
               }}
             />
           )}
+
+          {/* ================================================================
+              TAB 2: NET-TARIFF ARENA & ECONOMIC GATE
+              ================================================================ */}
+          {activeTab === "arena" && <NetTariffArenaTab />}
+
+          {/* ================================================================
+              TAB 3: CASHFLOW WATERFALL, PSD2 SCA & DATASOURCES
+              ================================================================ */}
+          {activeTab === "waterfall" && <CashflowOpenFinanceTab />}
+
           {/* ================================================================
               TAB 4: VOICE COPILOT, VAULT & WPIG FIREWALL
               ================================================================ */}
@@ -641,6 +713,7 @@ function Workspace({
                 ) : null}
 
                 <DropVault userId={userId} />
+                <DocumentExplorerWidget userId={userId} />
               </section>
 
               <section className="panel transcript-panel">
