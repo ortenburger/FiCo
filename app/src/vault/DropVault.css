@@ -1,0 +1,56 @@
+.drop-vault {
+  max-width: 28rem;
+  margin: 0 auto;
+  font-family: system-ui, sans-serif;
+}
+
+.drop-vault__title {
+  font-size: 1.125rem;
+  margin: 0 0 0.5rem;
+}
+
+.drop-vault__hint {
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 0 0 1rem;
+}
+
+.drop-vault__zone {
+  border: 2px dashed #94a3b8;
+  border-radius: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.drop-vault__zone--active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.drop-vault__zone--busy {
+  cursor: wait;
+  opacity: 0.85;
+}
+
+.drop-vault__status {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.drop-vault__status--error {
+  color: #b91c1c;
+}
+
+.drop-vault__key {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  word-break: break-all;
+  color: #334155;
+}
+
+.drop-vault__key-label {
+  font-weight: 600;
+}
