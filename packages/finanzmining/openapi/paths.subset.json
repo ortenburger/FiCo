@@ -1,0 +1,421 @@
+{
+  "openapi": "3.0.2",
+  "title": "cashbuzz platform API",
+  "version": "1.2.1",
+  "servers": [
+    {
+      "url": "https://api.cashbuzz.io/v01"
+    }
+  ],
+  "securitySchemes": {
+    "cashbuzzKey": {
+      "type": "apiKey",
+      "name": "x-api-Key",
+      "in": "header"
+    },
+    "authKey": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "secure token"
+    }
+  },
+  "paths": {
+    "/accounts": {
+      "get": {
+        "operationId": "getAndSearchAllAccounts",
+        "summary": "Get and search all accounts",
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "post": {
+        "operationId": "postAccounts",
+        "summary": "Upload accounts",
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAllAccounts",
+        "summary": "Delete all accounts",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/accounts/{id}": {
+      "get": {
+        "operationId": "getAccount",
+        "summary": "Get an account",
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAccount",
+        "summary": "Delete an account",
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "patch": {
+        "operationId": "editAccount",
+        "summary": "Edit an account",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/categorization": {
+      "post": {
+        "operationId": "postCategorization",
+        "summary": "Categorize all transactions",
+        "tags": [
+          "Categorization"
+        ]
+      }
+    },
+    "/catsaction": {
+      "post": {
+        "operationId": "postCatsaction",
+        "summary": "Categorization of transactions",
+        "tags": [
+          "Catsaction"
+        ]
+      }
+    },
+    "/data": {
+      "get": {
+        "operationId": "getUserStatistics",
+        "summary": "Get statistics",
+        "tags": [
+          "Statistics"
+        ]
+      }
+    },
+    "/descriptions/classes": {
+      "get": {
+        "operationId": "getAllClassDescriptions",
+        "summary": "Get all classes",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/descriptions/classes/{id}": {
+      "get": {
+        "operationId": "getClassDoc",
+        "summary": "Get a single class",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/descriptions/attributes": {
+      "get": {
+        "operationId": "getAllAttributeDescriptions",
+        "summary": "Get all attributes",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/descriptions/attributes/{section}/{group}/{name}": {
+      "get": {
+        "operationId": "getAttributeDoc",
+        "summary": "Get attribute descriptions",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/descriptions/organizations/{id}": {
+      "get": {
+        "operationId": "getOrganization",
+        "summary": "Get organization information",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/descriptions/insights": {
+      "get": {
+        "operationId": "getAllInsightDescriptions",
+        "summary": "Get all available insights",
+        "tags": [
+          "Descriptions"
+        ]
+      }
+    },
+    "/documents": {
+      "post": {
+        "operationId": "uploadDocuments",
+        "summary": "Upload documents for different tasks",
+        "tags": [
+          "Document Upload"
+        ]
+      }
+    },
+    "/subscriptions": {
+      "get": {
+        "operationId": "getAndSearchAllsubscriptions",
+        "summary": "Get and search all subscriptions",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/suggestions": {
+      "get": {
+        "operationId": "getAllDailyHints",
+        "summary": "Get all hints",
+        "tags": [
+          "Daily Hints"
+        ]
+      }
+    },
+    "/securities": {
+      "get": {
+        "operationId": "getAndSearchAllSecurities",
+        "summary": "Get and search all securities",
+        "tags": [
+          "Securities"
+        ]
+      }
+    },
+    "/securities/{id}": {
+      "get": {
+        "operationId": "getSecurity",
+        "summary": "Get a security",
+        "tags": [
+          "Securities"
+        ]
+      }
+    },
+    "/trades": {
+      "get": {
+        "operationId": "getAndSearchAllTrades",
+        "summary": "Get and search all trading transactions",
+        "tags": [
+          "Trades"
+        ]
+      }
+    },
+    "/trades/{id}": {
+      "get": {
+        "operationId": "getASingleTrade",
+        "summary": "Get and search all trading transactions",
+        "tags": [
+          "Trades"
+        ]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "operationId": "getAndSearchAllTransactions",
+        "summary": "Get and search all transactions",
+        "tags": [
+          "Transactions"
+        ]
+      },
+      "post": {
+        "operationId": "postTransactions",
+        "summary": "Upload transactions for categorizations etc.",
+        "tags": [
+          "Transactions"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAllTransactions",
+        "summary": "Delete all transactions",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/transactions/{cb_id}": {
+      "get": {
+        "operationId": "getTransactionById",
+        "summary": "Get a transaction",
+        "tags": [
+          "Transactions"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteTransaction",
+        "summary": "Delete a transaction",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/insights/{section}/{group}/{name}": {
+      "get": {
+        "operationId": "insights",
+        "summary": "Retrieve insights",
+        "tags": [
+          "Users/insights"
+        ]
+      },
+      "post": {
+        "operationId": "insights",
+        "summary": "Create insight function",
+        "tags": [
+          "Users/insights"
+        ]
+      },
+      "patch": {
+        "operationId": "insights",
+        "summary": "Modify insight function",
+        "tags": [
+          "Users/insights"
+        ]
+      },
+      "delete": {
+        "operationId": "insights",
+        "summary": "Delete insight",
+        "tags": [
+          "Users/insights"
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "createUser",
+        "summary": "Create a new user/login user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/affinities": {
+      "get": {
+        "operationId": "getUserAffinities",
+        "summary": "Get all the affinities of the user",
+        "tags": [
+          "Users/affinities"
+        ]
+      }
+    },
+    "/users/attributes": {
+      "get": {
+        "operationId": "getUserAttributes",
+        "summary": "Get all the attributes of the user",
+        "tags": [
+          "Users/attributes"
+        ]
+      }
+    },
+    "/users/attributes/{section}/{group}/{name}": {
+      "get": {
+        "operationId": "getUserAttribute",
+        "summary": "Get one attribute of the user",
+        "tags": [
+          "Users/attributes"
+        ]
+      }
+    },
+    "/users/f_groups": {
+      "get": {
+        "operationId": "getUserFinanceGroups",
+        "summary": "Get all the finance groups of the user",
+        "tags": [
+          "Users/finance_groups"
+        ]
+      }
+    },
+    "/users/me": {
+      "post": {
+        "operationId": "validateUser",
+        "summary": "validate the authorized user with the validation code he provided",
+        "tags": [
+          "Users/me"
+        ]
+      },
+      "get": {
+        "operationId": "getAuthorizedUser",
+        "summary": "Get the authorized user",
+        "tags": [
+          "Users/me"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAuthorizedUser",
+        "summary": "Delete the authorized user",
+        "tags": [
+          "Users/me"
+        ]
+      },
+      "patch": {
+        "operationId": "editAuthorizedUser",
+        "summary": "Edit the authorized user",
+        "tags": [
+          "Users/me"
+        ]
+      }
+    },
+    "/users/me/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "logout the user",
+        "tags": [
+          "Users/me"
+        ]
+      }
+    },
+    "/users/me/executePasswordChange": {
+      "post": {
+        "operationId": "executePasswordChange",
+        "summary": "Execute password change",
+        "tags": [
+          "Users/me"
+        ]
+      }
+    },
+    "/users/me/executeEmailChange": {
+      "post": {
+        "operationId": "executeEmailChange",
+        "summary": "Execute eMail Change",
+        "tags": [
+          "Users/me"
+        ]
+      }
+    },
+    "/users/me/requestChange": {
+      "post": {
+        "operationId": "requestPasswordChange",
+        "summary": "Request change",
+        "tags": [
+          "Users/me"
+        ]
+      }
+    },
+    "/users/requestNewPassword": {
+      "post": {
+        "operationId": "requestNewPassword",
+        "summary": "Request a new password",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "operationId": "getUserById",
+        "summary": "Get the user with userId",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/contracts": {
+      "get": {
+        "operationId": "getAndSearchAllContracts",
+        "summary": "Get and search all contracts",
+        "tags": [
+          "Contracts"
+        ]
+      }
+    }
+  }
+}

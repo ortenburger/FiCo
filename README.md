@@ -172,14 +172,37 @@ Unlike generic AI wrappers, FiCo enforces hard regulatory invariants at the core
 
 ```
 packages/
-├── aisp/         # PSD2/PSD3 AISP adapter, HMAC webhooks, recurring transaction classifier
-├── api/          # High-performance Fastify edge API (synchronous, lightweight)
-├── db/           # Prisma schema & PostgreSQL migrations (double-entry ledger models)
-├── ledger/       # Append-only double-entry OCC engine + deterministic cash waterfall
-├── policy/       # Local OCR heuristics, economic circuit breakers, net-policy evaluation
-├── regulatory/   # WpIG investment firewall, VAG commission invariants, VVG state machine
-└── workers/      # BullMQ background workers for async document & upstream operations
+├── aisp/           # PSD2/PSD3 AISP adapter, HMAC webhooks, recurring transaction classifier
+├── datasources/    # Registry: Open Finance + finexpert + finanzmining + net tariffs
+├── finanzmining/   # cashbuzz analytics, predictions, contract identification
+├── net-tariffs/    # HonorarKonzept + con.fee Nettoprodukte connectors
+├── api/            # High-performance Fastify edge API (synchronous, lightweight)
+├── db/             # Prisma schema & PostgreSQL migrations (double-entry ledger models)
+├── ledger/         # Append-only double-entry OCC engine + deterministic cash waterfall
+├── policy/         # Local OCR heuristics, economic circuit breakers, net-policy evaluation
+├── regulatory/     # WpIG investment firewall, VAG commission invariants, VVG state machine
+└── workers/        # BullMQ background workers for async document & upstream operations
 ```
+
+### finanzmining (cashbuzz)
+
+Connectors in `@fico/finanzmining` (OpenAPI 1.2.1 → `https://api.cashbuzz.io/v01`):
+
+- **Analytics** — `/data`, insights, affinities, attributes, finance groups, daily hints
+- **Predictions** — `/transactions?only_predicted=true`, insight forecasts
+- **Contracts** — `/contracts`, `/subscriptions` (+ org enrichment)
+- **Enrichment** — categorize / catsaction / document upload (feeds identification)
+
+Cashback/voucher APIs are intentionally not wired (§ 48b VAG).
+
+### Nettotarif partners
+
+| Provider | Docs | Package |
+| --- | --- | --- |
+| HonorarKonzept | https://www.honorarkonzept.de/start.html | `@fico/net-tariffs` |
+| con.fee | https://www.confee.de/ | `@fico/net-tariffs` |
+
+API: `GET /v1/net-tariffs/products`, `POST /v1/net-tariffs/compare`, `POST /v1/net-tariffs/applications/handoff` (execution-only deep-links).
 
 ---
 

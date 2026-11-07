@@ -1,5 +1,7 @@
 import {
+  ANALYTICS_DATASOURCES,
   FINEXPERT_SCHNITTSTELLEN,
+  NET_TARIFF_DATASOURCES,
   OPEN_FINANCE_DATASOURCES,
   type DatasourceId,
   getDatasource,
@@ -27,6 +29,8 @@ export function describeDatasourceRegistry(
   const ids: DatasourceId[] = [
     ...OPEN_FINANCE_DATASOURCES,
     ...FINEXPERT_SCHNITTSTELLEN,
+    ...ANALYTICS_DATASOURCES,
+    ...NET_TARIFF_DATASOURCES,
   ];
 
   return ids.map((id) => {

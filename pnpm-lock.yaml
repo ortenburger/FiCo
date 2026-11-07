@@ -35,9 +35,15 @@ importers:
       '@fico/db':
         specifier: workspace:*
         version: link:../db
+      '@fico/finanzmining':
+        specifier: workspace:*
+        version: link:../finanzmining
       '@fico/ledger':
         specifier: workspace:*
         version: link:../ledger
+      '@fico/net-tariffs':
+        specifier: workspace:*
+        version: link:../net-tariffs
       '@fico/policy':
         specifier: workspace:*
         version: link:../policy
@@ -92,6 +98,18 @@ importers:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(tsx@4.23.15)
 
+  packages/finanzmining:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.5
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(tsx@4.23.15)
+
   packages/ledger:
     dependencies:
       '@fico/db':
@@ -101,6 +119,18 @@ importers:
         specifier: ^10.5.0
         version: 10.6.0
     devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(tsx@4.23.15)
+
+  packages/net-tariffs:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.5
       typescript:
         specifier: ^5.8.2
         version: 5.9.3

@@ -106,7 +106,7 @@ model FinancialInstitution {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String   @db.VarChar(255)
   bic       String?  @db.VarChar(11)
-  /// Datasource id: FINAPI | TINK | WEALTHAPI | FINEXPERT_REST | BLAU_DIREKT | BCA | FRANKE_BORNBERG | TAA | MVP
+  /// Datasource id: FINAPI | TINK | WEALTHAPI | FINEXPERT_* | FINNANZMINING | HONORARKONZEPT | CONFEE | …
   adapter   String   @db.VarChar(64)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 

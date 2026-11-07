@@ -4,6 +4,9 @@
  * Open Finance (AISP): finAPI, Tink, wealthAPI
  * finexpert Schnittstellen (https://www.finexpert.de/schnittstellen/):
  *   blau direkt, BCA AG, Franke & Bornberg, TAA, REST API, MVP-Systeme
+ * Net-tariff partners:
+ *   HonorarKonzept (https://www.honorarkonzept.de/start.html)
+ *   con.fee (https://www.confee.de/)
  */
 
 export type DatasourceDomain =
@@ -11,7 +14,9 @@ export type DatasourceDomain =
   | "WEALTH"
   | "INSURANCE_BROKER"
   | "TARIFF_COMPARISON"
-  | "MVP_SYNC";
+  | "MVP_SYNC"
+  | "ANALYTICS"
+  | "NET_TARIFF";
 
 export type DatasourceId =
   // Open Finance / Wealth
@@ -24,7 +29,12 @@ export type DatasourceId =
   | "BCA"
   | "FRANKE_BORNBERG"
   | "TAA"
-  | "MVP";
+  | "MVP"
+  // finanzmining / cashbuzz platform
+  | "FINNANZMINING"
+  // Nettotarif / Honorar partners
+  | "HONORARKONZEPT"
+  | "CONFEE";
 
 export type AuthScheme =
   | "OAUTH2_CLIENT_CREDENTIALS"
@@ -203,6 +213,72 @@ export const DATASOURCES: Record<DatasourceId, DatasourceDefinition> = {
     notes:
       "Sync with common Maklerverwaltungsprogramme — avoids double entry / inconsistency.",
   },
+  FINNANZMINING: {
+    id: "FINNANZMINING",
+    displayName: "finanzmining (cashbuzz)",
+    vendor: "Cashbuzz GmbH / finanzmining.de",
+    domain: "ANALYTICS",
+    docsUrl: "https://finanzmining.de",
+    auth: ["API_KEY"],
+    envPrefix: "FINNANZMINING",
+    capabilities: [
+      "analytics.statistics",
+      "analytics.insights",
+      "analytics.affinities",
+      "analytics.attributes",
+      "analytics.finance_groups",
+      "predictions.transactions",
+      "predictions.insights",
+      "contracts.identify",
+      "subscriptions.detect",
+      "enrichment.categorization",
+      "enrichment.documents",
+      "aisp.accounts.push",
+      "aisp.transactions.push",
+    ],
+    readOnly: true,
+    notes:
+      "cashbuzz platform API (api.cashbuzz.io/v01). Analytics, predictions, contract/subscription identification. Cashback/voucher surfaces intentionally not wired (§ 48b VAG).",
+  },
+  HONORARKONZEPT: {
+    id: "HONORARKONZEPT",
+    displayName: "HonorarKonzept",
+    vendor: "HonorarKonzept GmbH",
+    domain: "NET_TARIFF",
+    docsUrl: "https://www.honorarkonzept.de/start.html",
+    auth: ["PARTNER_LICENSE", "API_KEY"],
+    envPrefix: "HONORARKONZEPT",
+    capabilities: [
+      "net.tariffs.catalog",
+      "net.tariffs.compare",
+      "net.tariffs.application_handoff",
+      "net.mylife_invest",
+      "honorar.coaching",
+    ],
+    readOnly: false,
+    notes:
+      "Nettoprodukte + Honorarplattform (myLife Invest, Allianz Netto, panel carriers). Advisory fee only — no kickbacks (§ 48b VAG).",
+  },
+  CONFEE: {
+    id: "CONFEE",
+    displayName: "con.fee",
+    vendor: "con.fee AG",
+    domain: "NET_TARIFF",
+    docsUrl: "https://www.confee.de/",
+    auth: ["PARTNER_LICENSE", "API_KEY"],
+    envPrefix: "CONFEE",
+    capabilities: [
+      "net.tariffs.catalog",
+      "net.tariffs.compare",
+      "net.tariffs.application_handoff",
+      "net.weltmarkt_police",
+      "net.shu_panel",
+      "vorteilsrechner",
+    ],
+    readOnly: false,
+    notes:
+      "300+ Nettotarife (Leben/SHU/Rechtsschutz), Vorteilsrechner, Netto-Depotplattform. Depot kickback settlement not wired (§ 48b VAG).",
+  },
 };
 
 export const ALL_DATASOURCE_IDS = Object.keys(DATASOURCES) as DatasourceId[];
@@ -216,6 +292,13 @@ export const FINEXPERT_SCHNITTSTELLEN: DatasourceId[] = [
   "FRANKE_BORNBERG",
   "TAA",
   "MVP",
+];
+
+export const ANALYTICS_DATASOURCES: DatasourceId[] = ["FINNANZMINING"];
+
+export const NET_TARIFF_DATASOURCES: DatasourceId[] = [
+  "HONORARKONZEPT",
+  "CONFEE",
 ];
 
 export function getDatasource(id: DatasourceId): DatasourceDefinition {

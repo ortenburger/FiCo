@@ -56,6 +56,9 @@ export const DEFAULT_BASE_URLS: Record<DatasourceId, string> = {
   FRANKE_BORNBERG: "https://api.finexpert.de/api/v1/fb",
   TAA: "https://api.finexpert.de/api/v1/taa",
   MVP: "https://api.finexpert.de/api/v1/mvp",
+  FINNANZMINING: "https://api.cashbuzz.io/v01",
+  HONORARKONZEPT: "https://partner.honorarkonzept.de/api/v1",
+  CONFEE: "https://partner.confee.de/api/v1",
 };
 
 export function resolveBaseUrl(
