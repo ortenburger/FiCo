@@ -1,0 +1,1902 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>FiCo — Pitch Motion (1920×1080, 40s)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --sans: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+        --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, monospace;
+
+        --ink: #05070d;
+        --ink-2: #0a0f1a;
+        --paper: #f4f7fb;
+        --blue: #2563eb;
+        --blue-soft: #7ba4ff;
+        --emerald: #059669;
+        --emerald-bright: #10b981;
+        --danger: #e11d48;
+        --danger-bright: #fb7185;
+        --amber: #d97706;
+        --white: #ffffff;
+        --muted: rgba(255, 255, 255, 0.52);
+        --muted-ink: #64748b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+      }
+
+      #stage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1920px;
+        height: 1080px;
+        background: var(--ink);
+        overflow: hidden;
+        transform-origin: center center;
+        /* --scale is set by JS for preview; capture runs at 1:1 */
+        transform: translate(-50%, -50%) scale(var(--scale, 1));
+        font-family: var(--sans);
+        color: var(--white);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: geometricPrecision;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        visibility: hidden;
+      }
+
+      .layer {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* ---------- shared type ---------- */
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 19px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.42);
+      }
+
+      .eyebrow.dark {
+        color: #94a3b8;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      .display {
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 0.96;
+      }
+
+      .rv {
+        display: block;
+        overflow: hidden;
+      }
+
+      .rv > span {
+        display: block;
+        will-change: transform opacity;
+      }
+
+      .mono {
+        font-family: var(--mono);
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---------- grain + vignette ---------- */
+      #grain {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.05;
+        mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>");
+        z-index: 90;
+      }
+
+      #vignette {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 89;
+        background: radial-gradient(
+          ellipse 78% 68% at 50% 48%,
+          transparent 40%,
+          rgba(0, 0, 0, 0.55) 100%
+        );
+        opacity: 0.9;
+      }
+
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: #fff;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 95;
+      }
+
+      /* =============================================================
+         S1 — THE FINE PRINT
+         ============================================================= */
+      #s1 {
+        background: var(--ink);
+      }
+
+      #s1 .wall {
+        position: absolute;
+        inset: -12% -6% -12% -6%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 42px;
+        padding: 0 90px;
+        opacity: 0.85;
+        filter: blur(0.4px);
+      }
+
+      #s1 .wall p {
+        font-size: 12.5px;
+        line-height: 1.95;
+        color: rgba(255, 255, 255, 0.085);
+        text-align: justify;
+        hyphens: auto;
+      }
+
+      #s1 .veil {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(1100px 700px at 18% 46%, rgba(5, 7, 13, 0.94), transparent 72%),
+          linear-gradient(90deg, rgba(5, 7, 13, 0.97) 0%, rgba(5, 7, 13, 0.72) 46%, rgba(5, 7, 13, 0.3) 100%);
+      }
+
+      #s1 .scan {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 340px;
+        margin-left: -170px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(225, 29, 72, 0.16) 45%,
+          rgba(225, 29, 72, 0.3) 50%,
+          rgba(225, 29, 72, 0.16) 55%,
+          transparent
+        );
+        opacity: 0;
+      }
+
+      #s1 .scan::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        margin-left: -1px;
+        background: linear-gradient(180deg, transparent, rgba(251, 113, 133, 0.9), transparent);
+      }
+
+      #s1 .copy {
+        position: absolute;
+        left: 128px;
+        top: 300px;
+        width: 1000px;
+      }
+
+      #s1 .copy .eyebrow {
+        margin-bottom: 30px;
+      }
+
+      #s1 h1 {
+        font-size: 108px;
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        line-height: 0.95;
+      }
+
+      #s1 h1 em {
+        font-style: normal;
+        color: var(--danger-bright);
+      }
+
+      #s1 .sub {
+        margin-top: 34px;
+        font-size: 40px;
+        letter-spacing: -0.02em;
+        color: rgba(255, 255, 255, 0.55);
+        font-weight: 500;
+      }
+
+      #s1 .metric {
+        position: absolute;
+        right: 120px;
+        top: 690px;
+        width: 520px;
+        padding: 34px 38px 38px;
+        border-radius: 20px;
+        background: linear-gradient(160deg, rgba(225, 29, 72, 0.16), rgba(225, 29, 72, 0.04));
+        border: 1px solid rgba(225, 29, 72, 0.34);
+        backdrop-filter: blur(6px);
+      }
+
+      #s1 .metric .num {
+        font-size: 96px;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        color: var(--danger-bright);
+        line-height: 1;
+      }
+
+      #s1 .metric .lbl {
+        margin-top: 12px;
+        font-size: 24px;
+        line-height: 1.35;
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      /* =============================================================
+         S2 — THE FEE DRAG
+         ============================================================= */
+      #s2 {
+        background: linear-gradient(180deg, #06090f 0%, #080d18 100%);
+      }
+
+      #s2 .head {
+        position: absolute;
+        left: 128px;
+        top: 96px;
+        width: 1200px;
+      }
+
+      #s2 .head .eyebrow {
+        margin-bottom: 20px;
+      }
+
+      #s2 .head h2 {
+        font-size: 58px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.08;
+      }
+
+      #s2 .head h2 span {
+        color: rgba(255, 255, 255, 0.44);
+      }
+
+      #s2 svg.chart {
+        position: absolute;
+        left: 128px;
+        top: 330px;
+        width: 1060px;
+        height: 600px;
+        overflow: visible;
+      }
+
+      #s2 .legend {
+        position: absolute;
+        left: 128px;
+        top: 972px;
+        display: flex;
+        gap: 42px;
+        font-size: 21px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      #s2 .legend i {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 12px;
+        vertical-align: 1px;
+      }
+
+      #s2 .big {
+        position: absolute;
+        right: 128px;
+        top: 442px;
+        width: 580px;
+        text-align: right;
+      }
+
+      #s2 .big .cap {
+        font-family: var(--mono);
+        font-size: 19px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 18px;
+      }
+
+      #s2 .big .val {
+        font-size: 106px;
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        line-height: 1;
+        color: var(--danger-bright);
+        font-variant-numeric: tabular-nums;
+      }
+
+      #s2 .big .note {
+        margin-top: 20px;
+        font-size: 26px;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.58);
+      }
+
+      #s2 .assump {
+        position: absolute;
+        right: 130px;
+        top: 912px;
+        font-family: var(--mono);
+        font-size: 17px;
+        color: rgba(255, 255, 255, 0.26);
+        text-align: right;
+        line-height: 1.7;
+      }
+
+      /* =============================================================
+         S3 — 2026 / ALTERSVORSORGEDEPOT
+         ============================================================= */
+      #s3 {
+        background: radial-gradient(1400px 900px at 50% 46%, #123a86 0%, #0a1a3c 46%, #05070d 100%);
+      }
+
+      #s3 .ghost {
+        position: absolute;
+        left: 50%;
+        top: 45%;
+        transform: translate(-50%, -50%);
+        font-size: 560px;
+        font-weight: 800;
+        letter-spacing: -0.06em;
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(123, 164, 255, 0.16);
+        line-height: 1;
+        pointer-events: none;
+      }
+
+      #s3 .core {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 250px;
+        text-align: center;
+      }
+
+      #s3 .core .eyebrow {
+        color: rgba(123, 164, 255, 0.8);
+        margin-bottom: 34px;
+      }
+
+      #s3 .core h1 {
+        font-size: 118px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      #s3 .core .sub {
+        margin: 30px auto 0;
+        width: 1080px;
+        font-size: 34px;
+        line-height: 1.42;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      #s3 .chips {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 800px;
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+      }
+
+      #s3 .chip {
+        padding: 16px 30px;
+        border-radius: 999px;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: #dbeafe;
+        background: rgba(37, 99, 235, 0.18);
+        border: 1px solid rgba(123, 164, 255, 0.35);
+      }
+
+      /* =============================================================
+         S4 — THE PRODUCT (light)
+         ============================================================= */
+      #s4 {
+        background:
+          radial-gradient(900px 700px at 8% 4%, rgba(37, 99, 235, 0.1), transparent 62%),
+          radial-gradient(700px 600px at 96% 92%, rgba(14, 165, 233, 0.1), transparent 60%),
+          var(--paper);
+        color: #0f172a;
+      }
+
+      #s4 .left {
+        position: absolute;
+        left: 112px;
+        top: 150px;
+        width: 660px;
+      }
+
+      #s4 .left h2 {
+        margin-top: 24px;
+        font-size: 62px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1.04;
+        color: #0f172a;
+      }
+
+      #s4 .steps {
+        margin-top: 62px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+
+      #s4 .step {
+        display: grid;
+        grid-template-columns: 54px 1fr;
+        gap: 20px;
+        align-items: start;
+        opacity: 0.34;
+        transition: none;
+      }
+
+      #s4 .step .badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 19px;
+        font-weight: 600;
+        color: #64748b;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+      }
+
+      #s4 .step.on .badge {
+        color: #fff;
+        background: var(--blue);
+        border-color: var(--blue);
+        box-shadow: 0 10px 22px -10px rgba(37, 99, 235, 0.7);
+      }
+
+      #s4 .step h3 {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #0f172a;
+      }
+
+      #s4 .step p {
+        margin-top: 7px;
+        font-size: 20px;
+        line-height: 1.42;
+        color: #64748b;
+      }
+
+      #s4 .card {
+        position: absolute;
+        left: 820px;
+        top: 170px;
+        width: 980px;
+        height: 740px;
+        border-radius: 26px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow:
+          0 40px 80px -40px rgba(15, 23, 42, 0.34),
+          0 10px 24px -16px rgba(15, 23, 42, 0.16);
+        overflow: hidden;
+      }
+
+      #s4 .card .bar {
+        height: 62px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 24px;
+        border-bottom: 1px solid #eef2f8;
+        background: #fbfdff;
+      }
+
+      #s4 .card .bar .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #e2e8f0;
+      }
+
+      #s4 .card .bar .title {
+        margin-left: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      #s4 .card .bar .live {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #059669;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 999px;
+        padding: 5px 12px;
+      }
+
+      #s4 .views {
+        position: absolute;
+        inset: 62px 0 0 0;
+      }
+
+      #s4 .view {
+        position: absolute;
+        inset: 0;
+        padding: 46px 52px;
+        opacity: 0;
+      }
+
+      /* view A — ingest */
+      #s4 .drop {
+        height: 210px;
+        border-radius: 18px;
+        border: 2px dashed #bfdbfe;
+        background: #f5f9ff;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+
+      #s4 .drop .t1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #1e3a8a;
+      }
+
+      #s4 .drop .t2 {
+        margin-top: 8px;
+        font-size: 18px;
+        color: #64748b;
+      }
+
+      #s4 .file {
+        margin-top: 26px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 24px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 6px 18px -12px rgba(15, 23, 42, 0.3);
+      }
+
+      #s4 .file .pdf {
+        width: 46px;
+        height: 56px;
+        border-radius: 8px;
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+        color: #e11d48;
+      }
+
+      #s4 .file .name {
+        font-size: 21px;
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      #s4 .file .meta {
+        margin-top: 4px;
+        font-family: var(--mono);
+        font-size: 15px;
+        color: #94a3b8;
+      }
+
+      #s4 .prog {
+        margin-left: auto;
+        width: 220px;
+      }
+
+      #s4 .prog .track {
+        height: 8px;
+        border-radius: 999px;
+        background: #eff6ff;
+        overflow: hidden;
+      }
+
+      #s4 .prog .fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2563eb, #38bdf8);
+      }
+
+      #s4 .prog .pct {
+        margin-top: 8px;
+        text-align: right;
+        font-family: var(--mono);
+        font-size: 15px;
+        color: #2563eb;
+      }
+
+      #s4 .chips {
+        margin-top: 30px;
+        display: flex;
+        gap: 14px;
+      }
+
+      #s4 .chip {
+        padding: 14px 20px;
+        border-radius: 12px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        font-family: var(--mono);
+        font-size: 18px;
+        color: #b45309;
+        opacity: 0;
+      }
+
+      #s4 .chip b {
+        color: #9a3412;
+      }
+
+      /* view B — boss fight */
+      #s4 .fight-h {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+
+      #s4 .fight-h .t {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      #s4 .fight-h .hp {
+        font-family: var(--mono);
+        font-size: 17px;
+        color: #94a3b8;
+      }
+
+      #s4 .rows {
+        margin-top: 46px;
+        display: flex;
+        flex-direction: column;
+        gap: 38px;
+      }
+
+      #s4 .row .rl {
+        display: flex;
+        justify-content: space-between;
+        font-size: 21px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 12px;
+      }
+
+      #s4 .row .rl em {
+        font-style: normal;
+        font-family: var(--mono);
+        font-size: 18px;
+        color: #94a3b8;
+      }
+
+      #s4 .row .track {
+        height: 44px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        overflow: hidden;
+      }
+
+      #s4 .row .fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 12px;
+      }
+
+      #s4 .row.legacy .fill {
+        background: linear-gradient(90deg, #fda4af, #e11d48);
+      }
+
+      #s4 .row.net .fill {
+        background: linear-gradient(90deg, #34d399, #059669);
+      }
+
+      #s4 .dmg {
+        position: absolute;
+        left: 52px;
+        right: 52px;
+        bottom: 42px;
+        padding-top: 28px;
+        border-top: 1px solid #eef2f8;
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #059669;
+        opacity: 0;
+      }
+
+      #s4 .footnote {
+        position: absolute;
+        left: 52px;
+        right: 52px;
+        bottom: 42px;
+        font-family: var(--mono);
+        font-size: 15px;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+        opacity: 0;
+      }
+
+      #s4 .weekline {
+        position: absolute;
+        left: 52px;
+        right: 52px;
+        bottom: 42px;
+        padding-top: 26px;
+        border-top: 1px solid #eef2f8;
+        display: flex;
+        justify-content: space-between;
+        font-size: 19px;
+        color: #64748b;
+        opacity: 0;
+      }
+
+      #s4 .weekline b {
+        color: #0f172a;
+      }
+
+      #s4 .dmg span {
+        font-family: var(--mono);
+        font-size: 20px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+
+      /* view C — streak */
+      #s4 .streak {
+        display: flex;
+        align-items: center;
+        gap: 34px;
+        padding: 34px 38px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #fff7ed, #ffffff 60%);
+        border: 1px solid #fed7aa;
+      }
+
+      #s4 .streak .flame {
+        font-size: 74px;
+        line-height: 1;
+      }
+
+      #s4 .streak .n {
+        font-size: 54px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        color: #7c2d12;
+        line-height: 1;
+      }
+
+      #s4 .streak .l {
+        margin-top: 8px;
+        font-size: 21px;
+        color: #9a3412;
+      }
+
+      #s4 .xp {
+        margin-left: auto;
+        text-align: right;
+        font-family: var(--mono);
+        font-size: 30px;
+        font-weight: 700;
+        color: #c2410c;
+      }
+
+      #s4 .wf {
+        margin-top: 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      #s4 .wf .wrow {
+        display: grid;
+        grid-template-columns: 200px 1fr 120px;
+        align-items: center;
+        gap: 18px;
+        font-size: 19px;
+        color: #334155;
+      }
+
+      #s4 .wf .t {
+        height: 26px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        overflow: hidden;
+      }
+
+      #s4 .wf .f {
+        height: 100%;
+        width: 0%;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #93c5fd, #2563eb);
+      }
+
+      #s4 .wf .v {
+        font-family: var(--mono);
+        font-size: 17px;
+        color: #64748b;
+        text-align: right;
+      }
+
+      #s4 .toast {
+        position: absolute;
+        right: 52px;
+        bottom: 132px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        background: #0f172a;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        opacity: 0;
+        box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.7);
+      }
+
+      #s4 .toast b {
+        color: #fbbf24;
+      }
+
+      /* =============================================================
+         S5 — THE ENGINE
+         ============================================================= */
+      #s5 {
+        background: radial-gradient(1200px 800px at 74% 20%, #0d1730 0%, #06090f 60%, #04060b 100%);
+      }
+
+      #s5 .head {
+        position: absolute;
+        left: 128px;
+        top: 108px;
+      }
+
+      #s5 .head h2 {
+        margin-top: 22px;
+        font-size: 74px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.02;
+        width: 1120px;
+      }
+
+      #s5 .head h2 span {
+        color: rgba(255, 255, 255, 0.36);
+      }
+
+      #s5 .lead {
+        margin-top: 26px;
+        font-size: 27px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.46);
+        width: 900px;
+      }
+
+      #s5 .pipe {
+        position: absolute;
+        left: 128px;
+        right: 128px;
+        top: 540px;
+        height: 200px;
+      }
+
+      #s5 .pipe::before {
+        content: "";
+        position: absolute;
+        left: -160px;
+        right: -160px;
+        top: -120px;
+        bottom: -120px;
+        background: radial-gradient(
+          ellipse 50% 50% at 50% 50%,
+          rgba(37, 99, 235, 0.16),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      #s5 .rail {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 96px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          rgba(123, 164, 255, 0) 0%,
+          rgba(123, 164, 255, 0.55) 12%,
+          rgba(123, 164, 255, 0.55) 88%,
+          rgba(123, 164, 255, 0) 100%
+        );
+        transform-origin: left center;
+      }
+
+      #s5 .nodes {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      #s5 .node {
+        width: 300px;
+        text-align: left;
+      }
+
+      #s5 .node .pin {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #0b1220;
+        border: 2px solid rgba(123, 164, 255, 0.7);
+        margin-top: 90px;
+        box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.12);
+      }
+
+      #s5 .node.on .pin {
+        background: #7ba4ff;
+        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0.22);
+      }
+
+      #s5 .node .nm {
+        margin-top: 34px;
+        font-size: 27px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      #s5 .node .ds {
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 16px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      #s5 .laws {
+        position: absolute;
+        left: 128px;
+        bottom: 118px;
+        font-family: var(--mono);
+        font-size: 18px;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      #s5 .stats {
+        position: absolute;
+        right: 128px;
+        bottom: 110px;
+        display: flex;
+        gap: 64px;
+        text-align: right;
+      }
+
+      #s5 .stat .v {
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: #7ba4ff;
+        line-height: 1;
+      }
+
+      #s5 .stat .k {
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.34);
+      }
+
+      /* =============================================================
+         S6 — CTA
+         ============================================================= */
+      #s6 {
+        background: radial-gradient(1100px 760px at 50% 40%, #10265a 0%, #070c17 62%, #04060b 100%);
+      }
+
+      #s6 .wrap {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+
+      #s6 .mark {
+        font-size: 232px;
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        line-height: 1;
+        background: linear-gradient(140deg, #ffffff 24%, #9dc0ff 62%, #2563eb 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      #s6 .tag {
+        margin-top: 34px;
+        font-size: 46px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      #s6 .foot {
+        margin-top: 62px;
+        font-family: var(--mono);
+        font-size: 19px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.32);
+      }
+
+      #s6 .rule {
+        width: 92px;
+        height: 3px;
+        border-radius: 2px;
+        margin: 0 auto 40px;
+        background: linear-gradient(90deg, #2563eb, #38bdf8);
+      }
+
+      #hint {
+        position: fixed;
+        left: 14px;
+        bottom: 12px;
+        z-index: 200;
+        font: 12px/1.4 var(--mono);
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.08em;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <!-- ================= S1 ================= -->
+      <section class="scene" id="s1">
+        <div class="wall" id="wall"></div>
+        <div class="veil"></div>
+        <div class="scan" id="scan"></div>
+        <div class="copy">
+          <div class="eyebrow" id="s1-eyebrow">Altersvorsorge · Germany</div>
+          <h1>
+            <span class="rv"><span id="s1-l1">40 pages of</span></span>
+            <span class="rv"><span id="s1-l2">fine print.</span></span>
+          </h1>
+          <p class="sub rv" style="overflow: visible"><span id="s1-sub">One number they never print.</span></p>
+        </div>
+        <div class="metric" id="s1-metric">
+          <div class="num">−40%</div>
+          <div class="lbl">of your returns over 40 years, eaten by commissions and fees.</div>
+        </div>
+      </section>
+
+      <!-- ================= S2 ================= -->
+      <section class="scene" id="s2">
+        <div class="head">
+          <div class="eyebrow">The fee drag</div>
+          <h2>Same €140 a month.<br /><span>Two very different futures.</span></h2>
+        </div>
+
+        <svg class="chart" id="chart" viewBox="0 0 1060 600" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="gapFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e11d48" stop-opacity="0.34" />
+              <stop offset="100%" stop-color="#e11d48" stop-opacity="0.02" />
+            </linearGradient>
+            <clipPath id="gapClip"><rect id="gapClipRect" x="0" y="0" width="0" height="600" /></clipPath>
+          </defs>
+          <g id="grid"></g>
+          <path id="area" fill="url(#gapFill)" clip-path="url(#gapClip)" d="" />
+          <path id="p-net" fill="none" stroke="#60a5fa" stroke-width="4.5" stroke-linecap="round" d="" />
+          <path id="p-legacy" fill="none" stroke="#fb7185" stroke-width="4" stroke-linecap="round" d="" />
+          <g id="endlabels" opacity="0">
+            <text id="lbl-net" x="0" y="0" fill="#93c5fd" font-family="ui-monospace,Menlo,monospace" font-size="20" text-anchor="start"></text>
+            <text id="lbl-leg" x="0" y="0" fill="#fda4af" font-family="ui-monospace,Menlo,monospace" font-size="20" text-anchor="start"></text>
+          </g>
+        </svg>
+
+        <div class="legend">
+          <span><i style="background: #60a5fa"></i>Net tariff + Altersvorsorgedepot</span>
+          <span><i style="background: #fb7185"></i>Legacy gross policy</span>
+        </div>
+
+        <div class="big">
+          <div class="cap">Gap at retirement</div>
+          <div class="val" id="gapval">€0</div>
+          <div class="note">lost to front-loaded commissions,<br />TER and 40 years of drag.</div>
+        </div>
+
+        <div class="assump" id="assump">
+          €140/month · 40 years · 6.0% p.a. vs. 4.0% effective<br />
+          4.5% Zillmerung + 2.0% TER on the legacy contract
+        </div>
+      </section>
+
+      <!-- ================= S3 ================= -->
+      <section class="scene" id="s3">
+        <div class="ghost" id="s3-ghost">2026</div>
+        <div class="core">
+          <div class="eyebrow" id="s3-eyebrow">The reform</div>
+          <h1 class="display"><span class="rv"><span id="s3-word">Altersvorsorgedepot</span></span></h1>
+          <p class="sub" id="s3-sub">
+            Germany's new subsidised, tax-advantaged ETF pension account.
+          </p>
+        </div>
+        <div class="chips">
+          <div class="chip" id="s3-c1">State matching</div>
+          <div class="chip" id="s3-c2">Tax deferral</div>
+          <div class="chip" id="s3-c3">Commission-free</div>
+        </div>
+      </section>
+
+      <!-- ================= S4 ================= -->
+      <section class="scene" id="s4">
+        <div class="left">
+          <div class="eyebrow dark" id="s4-eyebrow">The product</div>
+          <h2>Meet your<br />fee monster.</h2>
+          <div class="steps">
+            <div class="step" id="s4-st1">
+              <div class="badge">01</div>
+              <div>
+                <h3>Drop your policy in</h3>
+                <p>Local OCR reads the PDF. Nothing leaves the device.</p>
+              </div>
+            </div>
+            <div class="step" id="s4-st2">
+              <div class="badge">02</div>
+              <div>
+                <h3>The fees show up</h3>
+                <p>Zillmerung, TER and 40 years of drag, decoded line by line.</p>
+              </div>
+            </div>
+            <div class="step" id="s4-st3">
+              <div class="badge">03</div>
+              <div>
+                <h3>Come back every Sunday</h3>
+                <p>Streaks, XP and a cash-flow waterfall that does the work.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="s4-card">
+          <div class="bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="title">FiCo · Copilot</span>
+            <span class="live">live</span>
+          </div>
+          <div class="views">
+            <!-- A -->
+            <div class="view" id="vA">
+              <div class="drop">
+                <div>
+                  <div class="t1">Drop your contract here</div>
+                  <div class="t2">PDF · max 20 MB · processed on-device</div>
+                </div>
+              </div>
+              <div class="file" id="vA-file">
+                <div class="pdf">PDF</div>
+                <div>
+                  <div class="name">Lebensversicherung_2019.pdf</div>
+                  <div class="meta">41 pages · scanned 1 Aug 2019</div>
+                </div>
+                <div class="prog">
+                  <div class="track"><div class="fill" id="vA-fill"></div></div>
+                  <div class="pct" id="vA-pct">0%</div>
+                </div>
+              </div>
+              <div class="chips">
+                <div class="chip" id="vA-c1">Zillmerung <b>4.5%</b></div>
+                <div class="chip" id="vA-c2">TER <b>2.0%</b></div>
+                <div class="chip" id="vA-c3">Duration <b>40y</b></div>
+              </div>
+              <div class="footnote" id="vA-foot">
+                3 cost blocks extracted · local text layer · nothing uploaded
+              </div>
+            </div>
+
+            <!-- B -->
+            <div class="view" id="vB">
+              <div class="fight-h">
+                <div class="t">Fee boss fight</div>
+                <div class="hp">40-year simulation</div>
+              </div>
+              <div class="rows">
+                <div class="row legacy">
+                  <div class="rl"><span>Legacy gross policy</span><em id="vB-lv">€0</em></div>
+                  <div class="track"><div class="fill" id="vB-legacy" style="width: 0%"></div></div>
+                </div>
+                <div class="row net">
+                  <div class="rl"><span>Net tariff + Altersvorsorgedepot</span><em id="vB-nv">€0</em></div>
+                  <div class="track"><div class="fill" id="vB-net" style="width: 0%"></div></div>
+                </div>
+              </div>
+              <div class="dmg" id="vB-dmg"><span>Lifetime fees avoided</span><b id="vB-dmgval">€0</b></div>
+            </div>
+
+            <!-- C -->
+            <div class="view" id="vC">
+              <div class="streak">
+                <div class="flame">🔥</div>
+                <div>
+                  <div class="n" id="vC-streak">14-week streak</div>
+                  <div class="l">Sunday money ritual · 2 minutes</div>
+                </div>
+                <div class="xp" id="vC-xp">+150 XP</div>
+              </div>
+              <div class="wf">
+                <div class="wrow">
+                  <span>Emergency shield</span>
+                  <div class="t"><div class="f" id="vC-w1"></div></div>
+                  <span class="v">78%</span>
+                </div>
+                <div class="wrow">
+                  <span>Debt payoff</span>
+                  <div class="t"><div class="f" id="vC-w2"></div></div>
+                  <span class="v">12%</span>
+                </div>
+                <div class="wrow">
+                  <span>Wealth engine</span>
+                  <div class="t"><div class="f" id="vC-w3"></div></div>
+                  <span class="v">10%</span>
+                </div>
+              </div>
+              <div class="weekline" id="vC-week">
+                <span>Routed this week: <b>€620 free surplus</b></span>
+                <span>Projected at 67: <b>€278,809</b></span>
+              </div>
+              <div class="toast" id="vC-toast">🔒 <b>Streak freeze</b> earned</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= S5 ================= -->
+      <section class="scene" id="s5">
+        <div class="head">
+          <div class="eyebrow">The engine</div>
+          <h2>One engine. <span>Not a wrapper.</span></h2>
+          <p class="lead">
+            Eleven packages, one append-only ledger — and the guards that keep it legal.
+          </p>
+        </div>
+
+        <div class="pipe">
+          <div class="rail" id="s5-rail"></div>
+          <div class="nodes">
+            <div class="node" id="s5-n1">
+              <div class="pin"></div>
+              <div class="nm">Open finance</div>
+              <div class="ds">PSD2 / PSD3 AISP sync<br />read-only, no payments</div>
+            </div>
+            <div class="node" id="s5-n2">
+              <div class="pin"></div>
+              <div class="nm">Double-entry ledger</div>
+              <div class="ds">append-only, OCC safe<br />deterministic waterfall</div>
+            </div>
+            <div class="node" id="s5-n3">
+              <div class="pin"></div>
+              <div class="nm">Net tariffs</div>
+              <div class="ds">HonorarKonzept · con.fee<br />no commission, no kickback</div>
+            </div>
+            <div class="node" id="s5-n4">
+              <div class="pin"></div>
+              <div class="nm">Regulatory guards</div>
+              <div class="ds">WpIG · VAG · VVG<br />compiled into code</div>
+            </div>
+            <div class="node" id="s5-n5">
+              <div class="pin"></div>
+              <div class="nm">Voice copilot</div>
+              <div class="ds">intake by voice<br />typed into the profile</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="laws">PSD2 · PSD3 · § 2 (2) Nr. 4 WpIG · § 48b VAG · § 63 VVG · § 34d GewO</div>
+
+        <div class="stats">
+          <div class="stat"><div class="v" id="s5-s1">11</div><div class="k">packages, one repo</div></div>
+          <div class="stat"><div class="v">0</div><div class="k">payment initiation</div></div>
+        </div>
+      </section>
+
+      <!-- ================= S6 ================= -->
+      <section class="scene" id="s6">
+        <div class="wrap">
+          <div>
+            <div class="rule" id="s6-rule"></div>
+            <div class="mark rv" style="overflow: visible"><span id="s6-mark">FiCo</span></div>
+            <div class="tag" id="s6-tag">Turn fees into compounding.</div>
+            <div class="foot" id="s6-foot">Founders Hackathon Stuttgart · 7 November 2026</div>
+          </div>
+        </div>
+      </section>
+
+      <div id="vignette"></div>
+      <div id="grain"></div>
+      <div id="flash"></div>
+    </div>
+
+    <div id="hint">space = play · ←/→ = 1s · click = play/pause</div>
+
+    <script>
+      // ============================================================
+      // FiCo pitch motion — deterministic frame renderer
+      // 1920×1080 · 30 fps · 40 s (1200 frames)
+      // ============================================================
+      const FPS = 30;
+      const DURATION = 40; // seconds
+      const T = DURATION * 1000;
+
+      const $ = (id) => document.getElementById(id);
+
+      const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+      const seg = (t, a, b) => clamp01((t - a) / (b - a));
+      const lerp = (a, b, p) => a + (b - a) * p;
+
+      const E = {
+        linear: (p) => p,
+        outCubic: (p) => 1 - Math.pow(1 - p, 3),
+        outQuart: (p) => 1 - Math.pow(1 - p, 4),
+        outQuint: (p) => 1 - Math.pow(1 - p, 5),
+        inCubic: (p) => p * p * p,
+        inOutCubic: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+        inOutQuart: (p) => (p < 0.5 ? 8 * p * p * p * p : 1 - Math.pow(-2 * p + 2, 4) / 2),
+        outExpo: (p) => (p >= 1 ? 1 : 1 - Math.pow(2, -10 * p)),
+        outBack: (p, s = 1.35) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2),
+      };
+
+      const eur = (n) =>
+        "€" + Math.round(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+      // ------------------------------------------------------------
+      // S1 — fine print wall
+      // ------------------------------------------------------------
+      const LEGAL = [
+        "§ 4 Abs. 2 – Der Versicherungsnehmer entrichtet den Beitrag jeweils zum Ersten eines Monats im Voraus. Die Abschluss- und Vertriebskosten werden nach dem Zillmerverfahren verrechnet und sind in den ersten fünf Versicherungsjahren in voller Höhe gezillmert.",
+        "Die laufenden Kosten für den Versicherungsschutz sowie die Verwaltungskosten werden dem Deckungskapital monatlich entnommen und sind in der Beitragskalkulation enthalten. Eine gesonderte Ausweisung erfolgt nur auf Anfrage und gegen Bearbeitungsgebühr.",
+        "Der Rückkaufswert entspricht dem Deckungskapital, vermindert um einen Stornoabzug in Höhe von bis zu zwölf Prozent der Summe der gezahlten Beiträge. Der Stornoabzug entfällt nach Ablauf des zehnten Versicherungsjahres.",
+        "Die Überschussbeteiligung erfolgt nach Maßgabe der dri. Die laufende Verzinsung beträgt zum Stand 31.12. höchstens 1,75 Prozent. Eine Garantie auf künftige Überschüsse besteht nicht; die Angaben dienen ausschließlich der modellhaften Darstellung.",
+        "Etwaige Gebühren für die Prämienfreistellung, Umschreibung, Teilung oder Übertragung des Vertrags werden nach der jeweils gültigen Gebührentabelle berechnet und dem Vertragsguthaben belastet. Änderungen der Gebührentabelle sind zulässig.",
+      ];
+
+      function buildWall() {
+        const wall = $("wall");
+        const cols = 4;
+        let html = "";
+        for (let c = 0; c < cols; c++) {
+          let para = "";
+          for (let k = 0; k < 13; k++) {
+            para += LEGAL[(c + k) % LEGAL.length] + " ";
+          }
+          html += `<p>${para}</p>`;
+        }
+        wall.innerHTML = html;
+      }
+      buildWall();
+
+      // ------------------------------------------------------------
+      // S2 — projection model (the video's numbers are computed, not asserted)
+      // ------------------------------------------------------------
+      const MODEL = {
+        monthly: 140,
+        years: 40,
+        netRate: 0.06,
+        legacyRate: 0.04,
+      };
+
+      function futureValue(monthly, annualRate, years) {
+        const r = annualRate / 12;
+        const n = years * 12;
+        return monthly * ((Math.pow(1 + r, n) - 1) / r);
+      }
+
+      const FV_NET = futureValue(MODEL.monthly, MODEL.netRate, MODEL.years);
+      const FV_LEGACY = futureValue(MODEL.monthly, MODEL.legacyRate, MODEL.years);
+      const GAP = FV_NET - FV_LEGACY;
+      const GAP_ROUND = Math.round(GAP / 100) * 100;
+
+      $("gapval").dataset.to = GAP_ROUND;
+
+      // chart geometry
+      const CW = 1060;
+      const CH = 600;
+      const PAD_L = 8;
+      const PAD_R = 150;
+      const PAD_T = 26;
+      const PAD_B = 40;
+      const IX = (i) => PAD_L + ((CW - PAD_L - PAD_R) * i) / MODEL.years;
+      const IY = (v) => CH - PAD_B - ((CH - PAD_T - PAD_B) * v) / FV_NET;
+
+      function series(rate) {
+        const pts = [];
+        for (let y = 0; y <= MODEL.years; y++) {
+          pts.push([IX(y), IY(futureValue(MODEL.monthly, rate, y))]);
+        }
+        return pts;
+      }
+
+      function toPath(pts) {
+        return pts.map((p, i) => (i === 0 ? "M" : "L") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+      }
+
+      const NET_PTS = series(MODEL.netRate);
+      const LEG_PTS = series(MODEL.legacyRate);
+      const NET_PATH = toPath(NET_PTS);
+      const LEG_PATH = toPath(LEG_PTS);
+      const AREA_PATH =
+        toPath(NET_PTS) +
+        " L" +
+        LEG_PTS[LEG_PTS.length - 1][0].toFixed(1) +
+        " " +
+        LEG_PTS[LEG_PTS.length - 1][1].toFixed(1) +
+        " " +
+        LEG_PTS.slice()
+          .reverse()
+          .map((p) => "L" + p[0].toFixed(1) + " " + p[1].toFixed(1))
+          .join(" ") +
+        " Z";
+
+      $("p-net").setAttribute("d", NET_PATH);
+      $("p-legacy").setAttribute("d", LEG_PATH);
+      $("area").setAttribute("d", AREA_PATH);
+
+      (function placeEndLabels() {
+        const x = IX(MODEL.years) + 22;
+        const nl = $("lbl-net");
+        const ll = $("lbl-leg");
+        nl.setAttribute("x", x);
+        nl.setAttribute("y", IY(FV_NET) + 34);
+        nl.textContent = eur(FV_NET);
+        ll.setAttribute("x", x);
+        ll.setAttribute("y", IY(FV_LEGACY) - 16);
+        ll.textContent = eur(FV_LEGACY);
+      })();
+
+      // grid
+      (function buildGrid() {
+        let g = "";
+        for (let i = 0; i <= 4; i++) {
+          const y = PAD_T + ((CH - PAD_T - PAD_B) * i) / 4;
+          g += `<line x1="0" y1="${y}" x2="${CW - PAD_R + 40}" y2="${y}" stroke="rgba(255,255,255,0.055)" stroke-width="1"/>`;
+        }
+        for (let i = 0; i <= 4; i++) {
+          const x = IX(i * 10);
+          g += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${CH - PAD_B}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
+          g += `<text x="${x}" y="${CH - 12}" fill="rgba(255,255,255,0.24)" font-family="ui-monospace,Menlo,monospace" font-size="16" text-anchor="middle">${i * 10}y</text>`;
+        }
+        $("grid").innerHTML = g;
+      })();
+
+      const netLen = $("p-net").getTotalLength();
+      const legLen = $("p-legacy").getTotalLength();
+      $("p-net").style.strokeDasharray = netLen;
+      $("p-legacy").style.strokeDasharray = legLen;
+
+      // ------------------------------------------------------------
+      // helpers for reveals
+      // ------------------------------------------------------------
+      function reveal(innerEl, p, distance = 110) {
+        const e = E.outQuart(p);
+        innerEl.style.transform = `translateY(${(1 - e) * distance}%)`;
+        innerEl.style.opacity = String(clamp01(p * 2.2));
+      }
+
+      function fadeSlide(el, p, { y = 26, x = 0, scale = 1 } = {}) {
+        const e = E.outCubic(p);
+        el.style.opacity = String(clamp01(p * 1.6));
+        el.style.transform = `translate(${(1 - e) * x}px, ${(1 - e) * y}px) scale(${lerp(
+          1 - (1 - scale),
+          1,
+          e
+        )})`;
+      }
+
+      function setScene(id, visible) {
+        const el = $(id);
+        el.style.visibility = visible ? "visible" : "hidden";
+        el.style.opacity = visible ? "1" : "0";
+      }
+
+      // ------------------------------------------------------------
+      // timeline
+      // ------------------------------------------------------------
+      const S = {
+        s1: [0, 6],
+        s2: [6, 13],
+        s3: [13, 19],
+        s4: [19, 29],
+        s5: [29, 35],
+        s6: [35, 40],
+      };
+
+      const s1 = $("s1");
+      const s2 = $("s2");
+      const s3 = $("s3");
+      const s4 = $("s4");
+      const s5 = $("s5");
+      const s6 = $("s6");
+
+      const NODES = ["s5-n1", "s5-n2", "s5-n3", "s5-n4", "s5-n5"];
+
+      function render(t) {
+        // ---------- scene windows (hard cuts, flash at the light cut) ----------
+        setScene("s1", t >= S.s1[0] && t < S.s1[1]);
+        setScene("s2", t >= S.s2[0] && t < S.s2[1]);
+        setScene("s3", t >= S.s3[0] && t < S.s3[1]);
+        setScene("s4", t >= S.s4[0] && t < S.s4[1]);
+        setScene("s5", t >= S.s5[0] && t < S.s5[1]);
+        setScene("s6", t >= S.s6[0]);
+
+        // ---------- flash on the paper cut ----------
+        const fd = Math.abs(t - S.s4[0]);
+        $("flash").style.opacity = String(fd < 0.22 ? 1 - fd / 0.22 : 0);
+        $("vignette").style.opacity = t >= 19 && t < 29 ? "0.18" : "0.9";
+
+        // ================= S1 =================
+        if (t < 6.2) {
+          const u = t;
+
+          const wall = $("wall");
+          wall.style.transform = `translateY(${(1 - E.outCubic(seg(u, 0, 6))) * -60}px)`;
+
+          $("s1-eyebrow").style.opacity = String(E.outCubic(seg(u, 0.15, 0.75)));
+          $("s1-eyebrow").style.transform = `translateY(${(1 - E.outCubic(seg(u, 0.15, 0.75))) * 14}px)`;
+
+          reveal($("s1-l1"), seg(u, 0.35, 1.15));
+          reveal($("s1-l2"), seg(u, 0.5, 1.3));
+          reveal($("s1-sub"), seg(u, 3.0, 3.8), 60);
+
+          // scan beam across the fine print
+          const sp = E.inOutCubic(seg(u, 2.0, 3.5));
+          $("scan").style.opacity = String(
+            seg(u, 2.0, 2.3) * (1 - seg(u, 3.3, 3.7)) * 0.95
+          );
+          $("scan").style.left = `${lerp(-6, 106, sp)}%`;
+
+          fadeSlide($("s1-metric"), seg(u, 4.1, 4.9), { y: 34, scale: 0.97 });
+
+          // settle-out at the cut
+          s1.style.transform = `scale(${lerp(1, 1.03, E.inCubic(seg(u, 5.4, 6)))})`;
+        }
+
+        // ================= S2 =================
+        if (t >= 5.8 && t < 13.2) {
+          const u = t - S.s2[0];
+
+          reveal($("s2").querySelector(".head h2"), seg(u, -0.35, 0.5));
+          $("s2").querySelector(".eyebrow").style.opacity = String(E.outCubic(seg(u, -0.3, 0.2)));
+
+          const draw = E.inOutCubic(seg(u, 0.55, 2.6));
+          const draw2 = E.inOutCubic(seg(u, 0.85, 2.9));
+          $("p-legacy").style.strokeDashoffset = String(legLen * (1 - draw));
+          $("p-net").style.strokeDashoffset = String(netLen * (1 - draw2));
+
+          const areaP = E.outCubic(seg(u, 2.3, 3.2));
+          $("gapClipRect").setAttribute("width", String((CW * areaP).toFixed(1)));
+
+          // count-up
+          const cp = E.outQuint(seg(u, 1.7, 3.6));
+          $("gapval").textContent = eur(GAP_ROUND * cp);
+          $("gapval").style.opacity = String(clamp01(seg(u, 1.4, 1.9) * 2));
+          $("s2").querySelector(".big .cap").style.opacity = String(
+            E.outCubic(seg(u, 1.2, 1.7))
+          );
+          $("s2").querySelector(".big .note").style.opacity = String(
+            E.outCubic(seg(u, 2.9, 3.6))
+          );
+          $("assump").style.opacity = String(E.outCubic(seg(u, 3.4, 4.2)) * 0.9);
+          $("endlabels").setAttribute("opacity", String(E.outCubic(seg(u, 3.0, 3.7))));
+
+          // legend
+          const lg = E.outCubic(seg(u, 2.8, 3.4));
+          $("s2").querySelector(".legend").style.opacity = String(lg);
+          $("s2").querySelector(".legend").style.transform = `translateY(${(1 - lg) * 12}px)`;
+
+          // pulse the gap number
+          const pulse = 1 + 0.03 * Math.sin(clamp01(seg(u, 3.6, 4.4)) * Math.PI);
+          $("gapval").style.transform = `scale(${pulse})`;
+          $("gapval").style.transformOrigin = "right center";
+
+          s2.style.transform = `scale(${lerp(1, 1.02, E.inCubic(seg(u, 6.4, 7)))})`;
+        }
+
+        // ================= S3 =================
+        if (t >= 12.8 && t < 19.2) {
+          const u = t - S.s3[0];
+
+          const gp = E.outCubic(seg(u, -0.3, 0.9));
+          $("s3-ghost").style.opacity = String(gp * 0.9);
+          $("s3-ghost").style.transform = `translate(-50%, -50%) scale(${lerp(1.14, 1, gp)})`;
+
+          $("s3-eyebrow").style.opacity = String(E.outCubic(seg(u, -0.25, 0.3)));
+          reveal($("s3-word"), seg(u, -0.15, 0.75));
+
+          const subp = E.outCubic(seg(u, 1.1, 1.9));
+          $("s3-sub").style.opacity = String(subp);
+          $("s3-sub").style.transform = `translateY(${(1 - subp) * 22}px)`;
+
+          ["s3-c1", "s3-c2", "s3-c3"].forEach((id, i) => {
+            const p = seg(u, 2.0 + i * 0.22, 2.7 + i * 0.22);
+            fadeSlide($(id), p, { y: 18, scale: 0.94 });
+          });
+
+          s3.style.transform = `scale(${lerp(1, 1.055, E.inCubic(seg(u, 5.5, 6)))})`;
+        }
+
+        // ================= S4 =================
+        if (t >= 18.8 && t < 29.2) {
+          const u = t - S.s4[0];
+
+          $("s4-eyebrow").style.opacity = String(E.outCubic(seg(u, -0.25, 0.25)));
+          reveal($("s4").querySelector(".left h2"), seg(u, -0.2, 0.6));
+
+          const cardP = E.outCubic(seg(u, -0.2, 0.65));
+          $("s4-card").style.opacity = String(clamp01(cardP * 1.8));
+          $("s4-card").style.transform = `translateY(${(1 - cardP) * 44}px) scale(${lerp(
+            0.975,
+            1,
+            cardP
+          )})`;
+
+          // steps
+          const act = (id, p, on) => {
+            const el = $(id);
+            el.style.opacity = String(lerp(0.28, 1, E.outCubic(p)));
+            el.querySelector(".badge").style.transform = `scale(${lerp(1, 1, p)})`;
+            el.classList.toggle("on", on);
+          };
+          act("s4-st1", seg(u, 0.4, 0.9), u < 3.1);
+          act("s4-st2", seg(u, 3.0, 3.5), u >= 3.1 && u < 6.7);
+          act("s4-st3", seg(u, 6.6, 7.1), u >= 6.7);
+
+          // --- view A ---
+          const aIn = E.outCubic(seg(u, 0.3, 0.9));
+          const aOut = 1 - seg(u, 3.0, 3.35);
+          $("vA").style.opacity = String(aIn * aOut);
+          $("vA").style.transform = `translateX(${(1 - aIn) * -26}px)`;
+
+          fadeSlide($("vA-file"), seg(u, 0.7, 1.2), { y: 18 });
+
+          const prog = E.inOutCubic(seg(u, 1.2, 2.3));
+          $("vA-fill").style.width = `${prog * 100}%`;
+          $("vA-pct").textContent = `${Math.round(prog * 100)}%`;
+
+          ["vA-c1", "vA-c2", "vA-c3"].forEach((id, i) => {
+            const p = seg(u, 2.3 + i * 0.16, 2.8 + i * 0.16);
+            const e = E.outBack(p, 1.5);
+            $(id).style.opacity = String(clamp01(p * 2));
+            $(id).style.transform = `translateY(${(1 - e) * 16}px) scale(${lerp(
+              0.9,
+              1,
+              e
+            )})`;
+          });
+
+          // --- view B ---
+          const bIn = E.outCubic(seg(u, 3.15, 3.7));
+          const bOut = 1 - seg(u, 6.6, 6.95);
+          $("vB").style.opacity = String(bIn * bOut);
+          $("vB").style.transform = `translateX(${(1 - bIn) * 26}px)`;
+
+          const race = E.inOutCubic(seg(u, 3.8, 5.6));
+          const race2 = E.inOutCubic(seg(u, 4.0, 5.9));
+          $("vB-legacy").style.width = `${57.4 * race}%`;
+          $("vB-net").style.width = `${100 * race2}%`;
+
+          $("vB-lv").textContent = eur(FV_LEGACY * race);
+          $("vB-nv").textContent = eur(FV_NET * race2);
+
+          // extraction footnote
+          $("vA-foot").style.opacity = String(E.outCubic(seg(u, 2.6, 3.1)) * 0.95);
+
+          // damage number
+          const dp = E.outBack(seg(u, 5.5, 6.2), 1.7);
+          $("vB-dmg").style.opacity = String(clamp01(seg(u, 5.4, 5.7) * 2));
+          $("vB-dmg").style.transform = `translateY(${(1 - dp) * 18}px)`;
+          $("vB-dmgval").textContent = eur(GAP_ROUND * E.outQuint(seg(u, 5.4, 6.4)));
+
+          // --- view C ---
+          const cIn = E.outCubic(seg(u, 6.75, 7.35));
+          $("vC").style.opacity = String(cIn);
+          $("vC").style.transform = `translateX(${(1 - cIn) * 26}px)`;
+
+          const wf1 = E.outCubic(seg(u, 7.2, 8.2));
+          const wf2 = E.outCubic(seg(u, 7.4, 8.4));
+          const wf3 = E.outCubic(seg(u, 7.6, 8.6));
+          $("vC-w1").style.width = `${wf1 * 78}%`;
+          $("vC-w2").style.width = `${wf2 * 12}%`;
+          $("vC-w3").style.width = `${wf3 * 10}%`;
+
+          const tp = E.outBack(seg(u, 7.9, 8.5), 1.6);
+          $("vC-toast").style.opacity = String(clamp01(seg(u, 7.9, 8.2) * 2));
+          $("vC-toast").style.transform = `translateY(${(1 - tp) * 26}px)`;
+
+          $("vC-week").style.opacity = String(E.outCubic(seg(u, 8.0, 8.6)));
+
+          // flame pulse
+          const fl = $("vC").querySelector(".flame");
+          fl.style.transform = `scale(${1 + 0.05 * Math.sin(u * 6)})`;
+
+          s4.style.transform = `scale(${lerp(1, 1.02, E.inCubic(seg(u, 9.4, 10)))})`;
+        }
+
+        // ================= S5 =================
+        if (t >= 28.8 && t < 35.2) {
+          const u = t - S.s5[0];
+
+          $("s5").querySelector(".eyebrow").style.opacity = String(E.outCubic(seg(u, -0.3, 0.2)));
+          reveal($("s5").querySelector(".head h2"), seg(u, -0.25, 0.55));
+
+          const leadP = E.outCubic(seg(u, 0.9, 1.6));
+          $("s5").querySelector(".lead").style.opacity = String(leadP * 0.95);
+          $("s5").querySelector(".lead").style.transform = `translateY(${(1 - leadP) * 18}px)`;
+
+          const railP = E.inOutCubic(seg(u, 0.6, 2.0));
+          $("s5-rail").style.transform = `scaleX(${railP})`;
+
+          NODES.forEach((id, i) => {
+            const p = seg(u, 1.1 + i * 0.42, 1.9 + i * 0.42);
+            const e = E.outCubic(p);
+            const n = $(id);
+            n.style.opacity = String(lerp(0.15, 1, e));
+            n.style.transform = `translateY(${(1 - e) * 22}px)`;
+            n.classList.toggle("on", u > 1.1 + i * 0.42);
+            n.querySelector(".pin").style.transform = `scale(${lerp(0.6, 1, e)})`;
+          });
+
+          $("s5").querySelector(".laws").style.opacity = String(
+            E.outCubic(seg(u, 3.2, 4.0)) * 0.95
+          );
+          $("s5").querySelector(".stats").style.opacity = String(E.outCubic(seg(u, 3.4, 4.2)));
+
+          s5.style.transform = `scale(${lerp(1, 1.02, E.inCubic(seg(u, 5.5, 6.2)))})`;
+        }
+
+        // ================= S6 =================
+        if (t >= 34.8) {
+          const u = t - S.s6[0];
+
+          const rp = E.outCubic(seg(u, 0.05, 0.55));
+          $("s6-rule").style.transform = `scaleX(${rp})`;
+          $("s6-rule").style.opacity = String(rp);
+
+          reveal($("s6-mark"), seg(u, -0.25, 0.6), 90);
+
+          fadeSlide($("s6-tag"), seg(u, 0.75, 1.45), { y: 22 });
+          fadeSlide($("s6-foot"), seg(u, 1.4, 2.1), { y: 16 });
+
+          // final fade to black
+          const outP = 1 - seg(u, 4.35, 4.95);
+          s6.style.opacity = String(outP);
+        }
+      }
+
+      // ------------------------------------------------------------
+      // stage scaling + player
+      // ------------------------------------------------------------
+      function fitStage() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.getElementById("stage").style.setProperty("--scale", String(s));
+      }
+      window.addEventListener("resize", fitStage);
+      fitStage();
+
+      const q = new URLSearchParams(location.search);
+      let clock = 0;
+      let playing = q.get("play") === "1";
+      let last = 0;
+
+      window.renderFrame = (ms) => {
+        clock = ((ms % T) + T) % T;
+        render(clock / 1000);
+      };
+
+      document.getElementById("hint").style.display = q.get("hint") === "0" ? "none" : "block";
+
+      if (q.has("t")) {
+        playing = false;
+        window.renderFrame(Number(q.get("t")) || 0);
+      } else {
+        window.renderFrame(0);
+      }
+
+      function loop(ts) {
+        if (!playing) return;
+        if (!last) last = ts;
+        clock = (clock + (ts - last)) % T;
+        last = ts;
+        render(clock / 1000);
+        requestAnimationFrame(loop);
+      }
+
+      function start() {
+        if (playing) return;
+        playing = true;
+        last = 0;
+        requestAnimationFrame(loop);
+      }
+      function pause() {
+        playing = false;
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          playing ? pause() : start();
+        }
+        if (e.code === "ArrowRight") {
+          pause();
+          window.renderFrame(clock + 1000);
+        }
+        if (e.code === "ArrowLeft") {
+          pause();
+          window.renderFrame(clock - 1000);
+        }
+      });
+      document.addEventListener("click", () => (playing ? pause() : start()));
+
+      if (q.get("play") === "1") start();
+    </script>
+  </body>
+</html>
